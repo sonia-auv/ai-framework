@@ -1,0 +1,17 @@
+path: ./datasets/data_robosub
+train: ./images/train/
+val: ./images/val/
+test: ./images/test/
+
+names:
+  0: bin
+  1: bin_bleue
+  2: bin_rouge
+  3: gate
+  4: gate_rouge
+  5: gate_bleue
+  6: torpilles
+  7: torpilles_target
+  8: buoy
+  9: samples_table
+  10: path
