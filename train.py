@@ -1,41 +1,32 @@
-import shutil
-import json
 from ultralytics import YOLO
-from ultralytics.data.converter import convert_coco
 import torch
-import gc
+import argparse
 
+def main():
+    parser = argparse.ArgumentParser(description="Entrainement AI SONIA Vision")
+    # Choix du modèle
+    parser.add_argument('--model-name', type=str, default='yolov8n.pt', help='Nom du modèle')
+    parser.add_argument('--load-model', type=str, default=None, help='Chemin du modèle à charger')
+    parser.add_argument('--dataset-yaml', type=str, default=None, help='Chemin du fichier de configuration du dataset')
 
-# Train the model
-if __name__ == "__main__":
-#     convert_coco(labels_dir='datasets/', cls91to80=False)
-#     with open("datasets/train.json", "r") as f:
-#         coco_json = json.load(f)
-#     yaml_content = """path: ./
-# train: images/train
-# val: images/val
-# names:
-# """
-#     for subclass in coco_json["categories"]:
-#         yaml_content += f"  {subclass['id']-1}: {subclass['name']}\n"
-#     with open("./yolo_labels/train.yaml", "w") as f:
-#         f.write(yaml_content)
+    # Entraînement
+    parser.add_argument('--batch-size', type=int, default=8, metavar='N', help='Taille des batchs (défaut: 8)')
+    parser.add_argument('--image-size', type=int, default=640, metavar='N', help='Taille des images (défaut: 640)')
+    parser.add_argument('--epochs', type=int, default=10, metavar='N', help='Nombre d\'epochs pour l\'entrainement (défaut: 10)')
+    parser.add_argument('--start-epoch', type=int, default=0, metavar='N', help='Epoch de départ (défaut:0)')
+    parser.add_argument('--save-period', type=int, default=1, help='Période de sauvegarde du modèle (défaut:1)')
+    # parser.add_argument('--augment', action='store_true', default=False, help='Augmentation des données et entraînement sur ces données augmentées')
 
-#     shutil.rmtree("./datasets/labels", ignore_errors=True)
-#     shutil.move("./yolo_labels/labels", "./datasets/labels")
-#     model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
-    # Load a model
-    # model.train(data='./yolo_labels/train.yaml', epochs=5, imgsz=640, save_period=1, batch=-1, plots=True)
-    
-    
-    
-    if torch.cuda.is_available():
-        print('Using' ,torch.cuda.get_device_name(torch.cuda.current_device()))
-        model = YOLO('yolov8n.pt')
-        try:
-            results = model.train(data='datasets/coco.yaml', epochs=10, imgsz=640, save_period=1, batch=60, plots=True)
-        except:
-            gc.collect()
-            torch.cuda.empty_cache()
+    args = parser.parse_args()
+    args.cuda = torch.cuda.is_available()
+    print("Cuda disponible :", args.cuda)
+
+    if args.load_model is not None:
+        model = YOLO(args.load_model)
     else:
-        print('cuda indisponible, ALLUMES LE GPU !!!')
+        model = YOLO(args.model_name)
+
+    model.train(data=args.dataset_yaml, epochs=args.epochs, imgsz=args.image_size, save_period=args.save_period, batch=args.batch_size, plots=True)
+
+if __name__ == "__main__":
+   main()
