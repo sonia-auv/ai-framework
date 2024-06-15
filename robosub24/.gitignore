@@ -1,0 +1,6 @@
+# Ignore everything in this directory
+*
+# Competition folders
+# !compe24
+# Except this file
+!.gitignore
