@@ -12,10 +12,10 @@ MODELS_DIR = 'models/'
 DATASET_DIR = 'datasets/'
 PATH_IMG_TEST = '/test/images'
 
-PARAMETERS_YAML = 'training_parameters.yaml'
-AUGMENT_YAML = 'augmentation.yaml'
-DEFAULT_YAML = CONFIG_DIR+'ultralytics_default.yaml'
-TEMP_YAML = CONFIG_DIR+'ultralytics_custom_config.yaml'
+PARAMETERS_YAML = CONFIG_DIR+'training_parameters.yaml'
+AUGMENT_YAML = CONFIG_DIR+'augmentation.yaml'
+DEFAULT_YAML = CONFIG_DIR+'.default/ultralytics_default.yaml'
+TEMP_YAML = CONFIG_DIR+'.default/ultralytics_custom_config.yaml'
 DATASET_YAML = 'data.yaml'
 
 
@@ -35,6 +35,9 @@ class AiSonia():
         elif self.args.model == 'yolov10':
             self.model = YOLOv10(self.args.load_model)
 
+        if self.args.name is None:
+            self.args.name = self.args.model
+
         self.generate_config()
 
         if self.args.inference:
@@ -48,12 +51,12 @@ class AiSonia():
         # Choix du modèle
         parser.add_argument('--project', 
                             type=str, 
-                            default='robosub24', 
-                            help='Nom du projet (défaut:robosub24)')
+                            default=None, 
+                            help='Nom du projet (défaut:None)')
         parser.add_argument('--model', 
                             type=str, 
+                            required=True, 
                             choices=['yolov8', 'yolov9', 'yolov10'], 
-                            default='yolov8n', 
                             help='Modèle choisi (défaut:yolov8)')
         parser.add_argument('--name', 
                             type=str, 
