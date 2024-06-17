@@ -66,7 +66,7 @@ To labellise our images, we use https://labelbox.com. To make a good labelling t
       <figcaption>What to do</figcaption>
      </figure>
    - <figure>
-      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_bad.png width="200"><br/><img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_2_bad.png width="200"><br/>
+      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_bad.png width="200"><img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_2_bad.png width="200"><br/>
       <figcaption>What not to do</figcaption>
      </figure>
  - Make bounding boxes smallest box possible. This way, boxes will fit better the size of the object and the model will be more accurate.
