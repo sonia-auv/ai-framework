@@ -63,11 +63,11 @@ To labellise our images, we use https://labelbox.com. To make a good labelling t
  - Make bounding boxes neither larger nor smaller than the object.
    - <figure>
       <figcaption>What to do:</figcaption><br/>
-      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_good.png heigth="100">
+      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_good.png height="100">
      </figure>
    - <figure>
       <figcaption>What not to do:</figcaption><br/>
-      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_bad.png heigth="100"><img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_2_bad.png heigth="100">
+      <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_1_bad.png height="100"><img src=https://github.com/sonia-auv/ai-framework/blob/test/images/case_2_bad.png height="100">
      </figure>
  - Make bounding boxes smallest box possible. This way, boxes will fit better the size of the object and the model will be more accurate.
  - Even if the orientation of the object is not perfect, the box must contain the whole object. 
