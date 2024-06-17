@@ -22,6 +22,8 @@ With conda:
 
 ## Datasets
 
+### Data architecture
+
 To add a new dataset, create the following folders :
 - `./datasets/<new dataset>/`
   - `./datasets/<new dataset>/train/`
@@ -56,15 +58,13 @@ names:
   4: classe_5
 ```
 
-## Help
-To get help, use:
-```powershell
-python3 main.py --help
-```
-Or:
-```powershell
-python3 main.py -h
-```
+### Labelling
+To labellise our images, we use https://labelbox.com. To make a good labelling that enable to train a good model, you have to remember to:
+ - Make bounding boxes that includes the whole object, if the box is smaller than the object, it won't work.
+   - Good example: <img src=https://github.com/sonia-auv/ai-framework/blob/test/images/ase_1_good.png>
+   - Bad example: ![](https://github.com/sonia-auv/ai-framework/blob/test/images/ase_1_bad.png)
+ - Make bounding boxes smallest box possible. This way, boxes will fit better the size of the object and the model will be more accurate.
+ - Even if the orientation of the object is not perfect, the box must contain the whole object. 
 
 ## Run
 
@@ -84,7 +84,7 @@ python3 main.py --model='yolov8' --load-model='models/yolov8n.pt' --dataset='dat
  - `--augment` **optionnal**, if used, an augmentation is done on the training data, if not no augmentation (default: False),
  - `--resume` **optionnal**, use this if you are continuing a previous training (put only *--resume*).
 
-There is more parameters in the configuration files:
+There is more parameters in our configuration files, you can modify the following files :
  - `config/training_parameters.yaml`
  ```yaml
  # Ultralytics YOLO 🚀, AGPL-3.0 license.
@@ -92,7 +92,7 @@ There is more parameters in the configuration files:
  
  # Main settings  -------------------------------------------------------------------------------------------------------
  # Do not change these parameters (or the model won't  work and won't learn).
- task: segment # (str) YOLO task, i.e. detect, segment,  classify, pose.
+ task: segment # (str) YOLO task, i.e. detect, segment, classify, pose.
  mode: train # (str) YOLO mode, i.e. train, val,  predict, export, track, benchmark.
  
  # Train settings  -------------------------------------------------------------------------------------------------------
@@ -182,6 +182,7 @@ There is more parameters in the configuration files:
 
 **PLEASE DO NOT MODIFIE FILES INSIDE `./config/.default/` !!!**
 
+
 ### Prediction
 Instructions about how to predict the results on one or several images.
 
@@ -196,6 +197,18 @@ python3 main.py --inference --model='yolov8' --load-model='models/yolov8n.pt' --
  - `--dataset` **mandatory**, name of the selected dataset (every dataset are in the folder **./datasets**, example: 'data_test'),
  - `--inf-confidence` **optionnal**, minimum confidence treshold (default: 0.5),
  - `--inf-img-size` **optionnal**, set the input size of images in the model (default: 320).
+
+
+### Help
+
+To get help, use:
+```powershell
+python3 main.py --help
+```
+Or:
+```powershell
+python3 main.py -h
+```
 
 ## License
 
