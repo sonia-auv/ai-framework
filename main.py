@@ -93,8 +93,8 @@ class AiSonia():
                             help='Confiance minimum pour l\'inférence (défaut:0.5)')
         parser.add_argument('--inf-img-size', 
                             type=int, 
-                            default=320, 
-                            help='Taille de l\'image pour l\'inférence (défaut:320)')
+                            default=640, 
+                            help='Taille de l\'image pour l\'inférence (défaut:640)')
         # Parsing des arguments
         self.args = parser.parse_args(namespace=None)
 

@@ -198,14 +198,14 @@ Instructions about how to predict the results on one or several images.
 The following command will display the detected boxes on each test images. To see the next image, do any key. 
 
 ```powershell
-python3 main.py --inference --model='yolov8' --load-model='models/yolov8n.pt' --dataset='data_test' --inf-img-size=320 --inf-confidence=0.5
+python3 main.py --inference --model='yolov8' --load-model='models/yolov8n.pt' --dataset='data_test' --inf-img-size=640 --inf-confidence=0.5
 ```
  - `--inference` **mandatory**, set as the mode as prediction,
  - `--model` **mandatory**, set the chosen model (choices: ['yolov8', 'yolov9', 'yolov10']),
  - `--load-model` **mandatory**, path to the model weights (for example: models/yolov8n.pt),
  - `--dataset` **mandatory**, name of the selected dataset (every dataset are in the folder **./datasets**, example: 'data_test'),
  - `--inf-confidence` **optionnal**, minimum confidence treshold (default: 0.5),
- - `--inf-img-size` **optionnal**, set the input size of images in the model (default: 320).
+ - `--inf-img-size` **optionnal**, set the input size of images in the model (default: 640).
 
 
 ### Help
