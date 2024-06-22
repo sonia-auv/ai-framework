@@ -44,7 +44,7 @@ class ItemsRobosub():
 def main():
     items = ItemsRobosub()
     dist = items.get_dist(200, 200, 'torpille')
-    print(d, items.get_target_index(50, 50, d))
+    print(dist, items.get_target_index(50, 50, dist))
 
 if __name__ == '__main__':
     main()
