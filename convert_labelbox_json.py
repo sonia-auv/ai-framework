@@ -6,6 +6,7 @@ from os.path import isfile, join
 
 
 DATASET_YAML = '/data.yaml'
+DATASET_JSON = '/data.json'
 DATASET_DIR = 'datasets/'
 TRAIN_IMAGES = '/train/images/'
 VAL_IMAGES = '/val/images/'
@@ -36,11 +37,13 @@ val_images = [f for f in listdir(val_img_path) if isfile(join(val_img_path, f))]
 test_img_path = DATASET_DIR+args.dataset+TEST_IMAGES
 test_images = [f for f in listdir(test_img_path) if isfile(join(test_img_path, f))]
 
-with open('data.json', encoding='utf-8') as f:
+with open(DATASET_DIR + args.dataset + DATASET_JSON, encoding='utf-8') as f:
     data = json.load(f)
 
 for image in data:
     img_name = image['data_row']['external_id']
+    img_width = image['media_attributes']['width']
+    img_height = image['media_attributes']['height']
     label_name = img_name[:-3]+'txt'
 
     if img_name in test_images:
@@ -53,10 +56,14 @@ for image in data:
     with open(label_path, 'w', encoding='utf-8') as label_file:
         for label in image['projects']['cly4ximqr01kv081v0jqweg8a']['labels'][0]['annotations']['objects']:
             class_id = class_ids[class_names.index(label['name'])]
-            x_min = int(label['bounding_box']['top'])
-            y_min = int(label['bounding_box']['left'])
+            top = int(label['bounding_box']['top'])
+            left = int(label['bounding_box']['left'])
             h = label['bounding_box']['height']
             w = label['bounding_box']['width']
-            x_max = int(x_min + h)
-            y_max = int(y_min + w)
-            label_file.write('{} {} {} {} {}\n'.format(class_id, x_min, y_min, x_max, y_max))
+            c_x = int(left + w/2)
+            c_y = int(top + h/2)
+            label_file.write('{} {} {} {} {}\n'.format(class_id, 
+                                                       c_x/img_width, 
+                                                       c_y/img_height, 
+                                                       w/img_width, 
+                                                       h/img_height))
