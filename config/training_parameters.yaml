@@ -19,8 +19,8 @@ patience: 20 # (int) epochs to wait for no observable improvement for early stop
 # Take care not to overload the RAM memory of your computer.
 batch: 16 # (int) number of images per batch (-1 for AutoBatch).
 
-# 640 is good, 320 is faster but induces a loss of precision.
-imgsz: 640 # (int | list) input images size as int for train and val modes, or list[w,h] for predict and export modes.
+# [600, 400] is good, 320 is faster but induces a loss of precision.
+imgsz: [600, 400] # (int | list) input images size as int for train and val modes, or list[w,h] for predict and export modes.
 
 # If you want to train a model, don't set it as False.
 save: True # (bool) save train checkpoints and predict results.
