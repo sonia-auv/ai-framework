@@ -1,8 +1,7 @@
-path: data_robosub
-train: images/train/
-val: images/val/
-test: images/test/
-
+path: ../datasets/data_robosub
+train: train/images/
+val: val/images/
+test: test/images/
 names:
   0: bin
   1: bin_bleue
