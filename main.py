@@ -131,14 +131,21 @@ class AiSonia():
                 confidence = float(result.boxes.conf[i].item())*100
                 bounding_box = result.boxes.xyxy[i].cpu().numpy()
                 cv2.putText(img, 
-                            name+' '+"{:.1f}%".format(confidence), 
-                            (int(bounding_box[0])+10,int(bounding_box[1])), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 
-                            1, (0,0,255), 2, 1)
+                            name, 
+                            (int((bounding_box[0]+5)),
+                             int((bounding_box[1]+bounding_box[3]-10)/2)), 
+                            cv2.FONT_HERSHEY_PLAIN, 
+                            .7, (0,0,255), 1, 1)
+                cv2.putText(img, 
+                            "{:.1f}%".format(confidence), 
+                            (int((bounding_box[0]+5)),
+                             int((bounding_box[1]+bounding_box[3]+10)/2)), 
+                            cv2.FONT_HERSHEY_PLAIN, 
+                            .7, (0,0,255), 1, 1)
                 cv2.rectangle(img, 
                             (int(bounding_box[0]),int(bounding_box[1])), 
                             (int(bounding_box[2]),int(bounding_box[3])), 
-                            (0,0,255), 2)
+                            (0,0,255), 1)
             cv2.imshow('frame', img)
             if cv2.waitKey(0) & 0xFF == ord('q'):
                 break
