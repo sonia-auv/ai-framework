@@ -28,7 +28,7 @@ fliplr: 0.0 # (float) image flip left-right (probability).
 
 # No idea whether these transformation improves learning or not, we need to test it.
 mosaic: 0.0 # (float) image mosaic (probability).
-close_mosaic: 10 # (int) disable mosaic augmentation for final epochs (0 to disable).
+close_mosaic: 50 # (int) disable mosaic augmentation for final epochs (0 to disable).
 
 # No idea whether these transformation improves learning or not, we need to test it.
 mixup: 0.0 # (float) image mixup (probability).

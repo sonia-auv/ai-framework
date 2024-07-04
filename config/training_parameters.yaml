@@ -11,7 +11,7 @@ mode: train # (str) YOLO mode, i.e. train, val, predict, export, track, benchmar
 epochs: 100 # (int) number of epochs to train for.
 
 # Warning it overides the number of epochs, useful is you have a known delay to train your model (at the competition).
-time: # (float, optional) number of hours to train for, overrides epochs if supplied.
+time: 5 # (float, optional) number of hours to train for, overrides epochs if supplied.
 
 # Stop the training after this number of epochs without improvements.
 patience: 20 # (int) epochs to wait for no observable improvement for early stopping of training.
