@@ -1,4 +1,4 @@
-path: ../../datasets/data_test_1
+path: ../datasets/data_sonia_1
 train: train/images/
 val: val/images/
 test: test/images/

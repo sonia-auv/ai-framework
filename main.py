@@ -1,4 +1,4 @@
-from ultralytics import YOLO#, YOLOv10
+from ultralytics import YOLO
 import torch
 import argparse
 import yaml
@@ -30,10 +30,8 @@ class AiSonia():
             print('Cuda non disponible')
 
         # Loading model
-        if self.args.model in ['yolov8', 'yolov9']:
+        if self.args.model in ['yolov8', 'yolov9', 'yolov10']:
             self.model = YOLO(self.args.load_model)
-        # elif self.args.model == 'yolov10':
-        #     self.model = YOLOv10(self.args.load_model)
 
         if self.args.name is None:
             self.args.name = self.args.model
@@ -56,7 +54,7 @@ class AiSonia():
         parser.add_argument('--model', 
                             type=str, 
                             required=True, 
-                            choices=['yolov8', 'yolov9'],#, 'yolov10'], 
+                            choices=['yolov8', 'yolov9', 'yolov10'], 
                             help='Modèle choisi (défaut:yolov8)')
         parser.add_argument('--name', 
                             type=str, 
