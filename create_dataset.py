@@ -35,12 +35,11 @@ def filename_available(path):
 
 
 def move_files(src_path, out_path):
-    dirs = get_dirs(src_path)
-    for dir in dirs:
+    for dir in get_dirs(src_path):
         files = get_files(src_path+dir)
         while len(files) > 0:
             k = randint(0, len(files)-1)
-            out_name = find_name(out_path, dir[:-6])
+            out_name = find_name(out_path, dir)
             move(src_path+dir+'/'+files[k], out_path+out_name)
             files = get_files(src_path+dir)
 
@@ -49,8 +48,17 @@ def split_dataset(src_path, out_path, train_proba=0.7, val_proba=0.2):
     train_path = 'train/images/'
     val_path = 'val/images/'
     test_path = 'test/images/'
+    if not exists(out_path+train_path):
+        mkdir(out_path+'train')
+        mkdir(out_path+'train/images')
+    if not exists(out_path+val_path):
+        mkdir(out_path+'val')
+        mkdir(out_path+'val/images')
+    if not exists(out_path+test_path):
+        mkdir(out_path+'test')
+        mkdir(out_path+'test/images')
     for dir in get_dirs(src_path):
-        name = dir[:-6]
+        name = dir
         temp_files = []
         for file in get_files(out_path):
             if name in file:
@@ -79,7 +87,8 @@ def main():
                         help='Source dataset path (required)')
     parser.add_argument('--dataset-name', 
                         type=str, 
-                        required=False, 
+                        required=False,
+                        default='on_working_directory', 
                         help='Dataset name (default:on_working_directory)')
     parser.add_argument('--train-proba', 
                         type=float, 

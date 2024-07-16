@@ -30,7 +30,7 @@ class AiSonia():
             print('Cuda non disponible')
 
         # Loading model
-        if self.args.model in ['yolov8', 'yolov9', 'yolov10']:
+        if self.args.model in ['yolo']:
             self.model = YOLO(self.args.load_model)
 
         if self.args.name is None:
@@ -54,7 +54,7 @@ class AiSonia():
         parser.add_argument('--model', 
                             type=str, 
                             required=True, 
-                            choices=['yolov8', 'yolov9', 'yolov10'], 
+                            choices=['yolo'], 
                             help='Modèle choisi (défaut:yolov8)')
         parser.add_argument('--name', 
                             type=str, 

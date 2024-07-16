@@ -1,8 +1,8 @@
 import json
 import yaml
 import argparse
-from os import listdir
-from os.path import isfile, join
+from os import listdir, makedirs
+from os.path import isfile, join, exists
 
 
 DATASET_YAML = '/data.yaml'
@@ -14,7 +14,7 @@ TEST_IMAGES = '/test/images/'
 TRAIN_LABELS = '/train/labels/'
 VAL_LABELS = '/val/labels/'
 TEST_LABELS = '/test/labels/'
-
+PROJECT_ID = 'clyn59tv9063e07y07nku1bwx'
 
 parser = argparse.ArgumentParser(description="Entraînement AI SONIA Vision")
 # Choix du dataset
@@ -40,6 +40,13 @@ test_images = [f for f in listdir(test_img_path) if isfile(join(test_img_path, f
 with open(DATASET_DIR + args.dataset + DATASET_JSON, encoding='utf-8') as f:
     data = json.load(f)
 
+if not exists(DATASET_DIR+args.dataset+TEST_LABELS):
+    makedirs(DATASET_DIR+args.dataset+TEST_LABELS)
+if not exists(DATASET_DIR+args.dataset+TRAIN_LABELS):
+    makedirs(DATASET_DIR+args.dataset+TRAIN_LABELS)
+if not exists(DATASET_DIR+args.dataset+VAL_LABELS):
+    makedirs(DATASET_DIR+args.dataset+VAL_LABELS)
+
 for image in data:
     img_name = image['data_row']['external_id']
     img_width = image['media_attributes']['width']
@@ -54,7 +61,7 @@ for image in data:
         label_path = DATASET_DIR+args.dataset+TRAIN_LABELS+label_name
 
     with open(label_path, 'w', encoding='utf-8') as label_file:
-        for label in image['projects']['cly4ximqr01kv081v0jqweg8a']['labels'][0]['annotations']['objects']:
+        for label in image['projects'][PROJECT_ID]['labels'][0]['annotations']['objects']:
             class_id = class_ids[class_names.index(label['name'])]
             top = int(label['bounding_box']['top'])
             left = int(label['bounding_box']['left'])
