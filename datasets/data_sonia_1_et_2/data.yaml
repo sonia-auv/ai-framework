@@ -1,0 +1,17 @@
+path: ../../datasets/data_sonia_1_et_2
+train: train/images/
+val: val/images/
+test: test/images/
+
+names:
+  0: bin
+  1: bin_bleue
+  2: bin_rouge
+  3: gate
+  4: gate_rouge
+  5: gate_bleue
+  6: torpille
+  7: torpille_target
+  8: buoy
+  9: samples_table
+  10: path
