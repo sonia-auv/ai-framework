@@ -3,7 +3,7 @@ from os.path import isfile, join, exists
 from shutil import move
 from random import randint
 import argparse
-
+from utils import make_data_yaml
 
 def get_files(path):
     return [f for f in listdir(path) if isfile(join(path, f))]
@@ -106,7 +106,7 @@ def main():
     mkdir(out_path)
     move_files(src_path, out_path)
     split_dataset(src_path, out_path, args.train_proba, args.val_proba)
-    
+    make_data_yaml(args.dataset_name)
 
 
 if __name__ == '__main__':

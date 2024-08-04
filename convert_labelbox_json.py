@@ -22,6 +22,10 @@ parser.add_argument('--dataset',
                     type=str, 
                     required=True,
                     help='Nom du dataset')
+parser.add_argument('--project-id', 
+                    type=str, 
+                    default=PROJECT_ID,
+                    help='ID du projet')
 args = parser.parse_args(namespace=None)
 
 metadata = yaml.full_load(open(DATASET_DIR + args.dataset + DATASET_YAML, encoding='utf-8'))
@@ -61,7 +65,7 @@ for image in data:
         label_path = DATASET_DIR+args.dataset+TRAIN_LABELS+label_name
 
     with open(label_path, 'w', encoding='utf-8') as label_file:
-        for label in image['projects'][PROJECT_ID]['labels'][0]['annotations']['objects']:
+        for label in image['projects'][args.project_id]['labels'][0]['annotations']['objects']:
             class_id = class_ids[class_names.index(label['name'])]
             top = int(label['bounding_box']['top'])
             left = int(label['bounding_box']['left'])
