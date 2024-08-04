@@ -1,163 +1,122 @@
-from ultralytics import YOLO
-import torch
 import argparse
-import yaml
-import cv2
-from time import time
-from os import listdir
-from os.path import isfile, join
-
-CONFIG_DIR = 'config/'
-MODELS_DIR = 'models/'
-DATASET_DIR = 'datasets/'
-PATH_IMG_TEST = '/test/images'
-
-PARAMETERS_YAML = CONFIG_DIR+'training_parameters.yaml'
-AUGMENT_YAML = CONFIG_DIR+'augmentation.yaml'
-DEFAULT_YAML = CONFIG_DIR+'.default/ultralytics_default.yaml'
-TEMP_YAML = CONFIG_DIR+'.default/ultralytics_custom_config.yaml'
-DATASET_YAML = 'data.yaml'
-
-
-class AiSonia():
-    def __init__(self):
-        self.parse()
-
-        # Detecting GPU
-        if torch.cuda.is_available():
-            print('Cuda disponible')
-        else:
-            print('Cuda non disponible')
-
-        # Loading model
-        if self.args.model in ['yolo']:
-            self.model = YOLO(self.args.load_model)
-
-        if self.args.name is None:
-            self.args.name = self.args.model
-
-        self.generate_config()
-
-        if self.args.inference:
-            self.predict()
-        else:
-            self.train()
-
-
-    def parse(self):
-        parser = argparse.ArgumentParser(description="Entraînement AI SONIA Vision")
-        # Choix du modèle
-        parser.add_argument('--project', 
-                            type=str, 
-                            default=None, 
-                            help='Nom du projet (défaut:None)')
-        parser.add_argument('--model', 
-                            type=str, 
-                            required=True, 
-                            choices=['yolo'], 
-                            help='Modèle choisi (défaut:yolov8)')
-        parser.add_argument('--name', 
-                            type=str, 
-                            default=None, 
-                            help='Nom du modèle (défaut:modèle choisi)')
-        parser.add_argument('--load-model', 
-                            type=str, 
-                            required=True, 
-                            default=None, 
-                            help='Chemin du modèle à charger')
-        parser.add_argument('--dataset', 
-                            type=str, 
-                            default=None, 
-                            required=True, 
-                            help='Chemin du fichier de configuration du dataset')
-        # Entraînement
-        parser.add_argument('--resume', 
-                            action='store_true', 
-                            default=False, 
-                            help='Poursuit un entraînement déjà commencé du modèle (défaut:False)')
-        # Augmentation des données
-        parser.add_argument('--augment', 
-                            action='store_true', 
-                            default=False, 
-                            help='Augmentation des données et entraînement sur ces données augmentées (défaut:False)')
-        # Inférence
-        parser.add_argument('--inference', 
-                            action='store_true', 
-                            default=False, 
-                            help='Chemin de l\'image sur laquelle une inférence est réalisée (défaut:False)')
-        parser.add_argument('--inf-confidence', 
-                            type=float, 
-                            default=0.5, 
-                            help='Confiance minimum pour l\'inférence (défaut:0.5)')
-        parser.add_argument('--inf-img-size', 
-                            type=int, 
-                            default=[600, 400], 
-                            help='Taille de l\'image pour l\'inférence (défaut:[600, 400])')
-        # Parsing des arguments
-        self.args = parser.parse_args(namespace=None)
-
-    def generate_config(self):
-        # Loading configuration
-        parameters = yaml.full_load(open(PARAMETERS_YAML))
-        settings = yaml.full_load(open(DEFAULT_YAML))
-        for key, value in parameters.items():
-            settings[key] = value
+from ai_sonia import AiSonia
+from labeling_sonia import LabelingSonia
+from dataset_sonia import DatasetSonia
+from utils import mix_datasets
         
-        # Loading augmentation settings
-        if self.args.augment:
-            augment = yaml.full_load(open(AUGMENT_YAML))
-            for key, value in augment.items():
-                settings[key] = value
-        yaml.dump(settings, open(TEMP_YAML, 'w'))
+def parse(self):
+    parser = argparse.ArgumentParser(description="AI SONIA Vision")
+    # Choix de la tâche réalisée
+    parser.add_argument('--task', 
+                        type=str, 
+                        required=True, 
+                        choices=['train', 'test', 'init_dataset', 'load_labels', 'mix_dataset'], 
+                        help='Tache réalisé')
+    # Init dataset
+    parser.add_argument('--src', 
+                        type=str, 
+                        default=None,
+                        help='Source dataset path (required)')
+    parser.add_argument('--dataset-name', 
+                        type=str, 
+                        default='on_working_directory', 
+                        help='Dataset name (default:on_working_directory)')
+    parser.add_argument('--train-proba', 
+                        type=float, 
+                        default=0.7, 
+                        help='Proportion of train (default:0.7)')
+    parser.add_argument('--val-proba', 
+                        type=float, 
+                        default=0.2, 
+                        help='Proportion of val (default:0.2)')
+    # Load labels
+    parser.add_argument('--project-id', 
+                        type=str, 
+                        default=None,
+                        help='Id du projet LabelBox')
+    # Mix dataset
+    # Choix du dataset
+    parser.add_argument('--new-dataset', 
+                        type=str, 
+                        default=None,
+                        help='Nom du dataset')
+    parser.add_argument('--dataset-list',
+                        '--list', 
+                        nargs='+', 
+                        default=None,
+                        help='Datasets à mélanger')
+    # Train or test models
+    # Choix du modèle
+    parser.add_argument('--project', 
+                        type=str, 
+                        default=None, 
+                        help='Nom du projet (défaut:None)')
+    parser.add_argument('--model', 
+                        type=str, 
+                        default=None,
+                        choices=[None, 'yolo'], 
+                        help='Modèle choisi (défaut:yolov8)')
+    parser.add_argument('--name', 
+                        type=str, 
+                        default=None, 
+                        help='Nom du modèle (défaut:modèle choisi)')
+    parser.add_argument('--load-model', 
+                        type=str, 
+                        default=None, 
+                        help='Chemin du modèle à charger')
+    parser.add_argument('--dataset', 
+                        type=str, 
+                        default=None, 
+                        help='Chemin du fichier de configuration du dataset')
+    # Entraînement
+    parser.add_argument('--resume', 
+                        action='store_true', 
+                        default=False, 
+                        help='Poursuit un entraînement déjà commencé du modèle (défaut:False)')
+    # Augmentation des données
+    parser.add_argument('--augment', 
+                        action='store_true', 
+                        default=False, 
+                        help='Augmentation des données et entraînement sur ces données augmentées (défaut:False)')
+    # Inférence
+    parser.add_argument('--inf-confidence', 
+                        type=float, 
+                        default=0.5, 
+                        help='Confiance minimum pour l\'inférence (défaut:0.5)')
+    parser.add_argument('--inf-img-size', 
+                        type=int, 
+                        default=[600, 400], 
+                        help='Taille de l\'image pour l\'inférence (défaut:[600, 400])')
+    # Parsing des arguments
+    return parser.parse_args(namespace=None)
 
-    def predict(self):
-        test_path = DATASET_DIR+self.args.dataset+PATH_IMG_TEST
-        img_list = [join(test_path, f) for f in listdir(test_path) if isfile(join(test_path, f))]
-        t1 = time()
-        results = self.model.predict(img_list, 
-                                     imgsz=self.args.inf_img_size, 
-                                     conf=self.args.inf_confidence, 
-                                     verbose=False)
-        t2 = time()
-        print(1/((t2-t1)/len(img_list)), 'fps')
-        for i, result in enumerate(results):
-            img = cv2.imread(img_list[i])
-            detection_count = result.boxes.shape[0]
-            for i in range(detection_count):
-                cls = int(result.boxes.cls[i].item())
-                name = result.names[cls]
-                confidence = float(result.boxes.conf[i].item())*100
-                bounding_box = result.boxes.xyxy[i].cpu().numpy()
-                cv2.putText(img, 
-                            name, 
-                            (int((bounding_box[0]+5)),
-                             int((bounding_box[1]+bounding_box[3]-10)/2)), 
-                            cv2.FONT_HERSHEY_PLAIN, 
-                            .7, (0,0,255), 1, 1)
-                cv2.putText(img, 
-                            "{:.1f}%".format(confidence), 
-                            (int((bounding_box[0]+5)),
-                             int((bounding_box[1]+bounding_box[3]+10)/2)), 
-                            cv2.FONT_HERSHEY_PLAIN, 
-                            .7, (0,0,255), 1, 1)
-                cv2.rectangle(img, 
-                            (int(bounding_box[0]),int(bounding_box[1])), 
-                            (int(bounding_box[2]),int(bounding_box[3])), 
-                            (0,0,255), 1)
-            cv2.imshow('frame', img)
-            if cv2.waitKey(0) & 0xFF == ord('q'):
-                break
-        cv2.destroyAllWindows()
-
-    def train(self):
-        self.model.train(project=self.args.project,
-                         name=self.args.name,
-                         data=DATASET_DIR+self.args.dataset+'/'+DATASET_YAML,
-                         resume=self.args.resume,
-                         cfg=TEMP_YAML)
-        
 def main():
-    sonia_ai = AiSonia()
+    args = parse()
+    if args.task == 'train' or args.task == 'test':
+        assert not args.dataset is None
+        assert not args.model is None
+        assert not args.load_model is None
+        sonia_ai = AiSonia(args)
+        if args.task == 'train':
+            sonia_ai.train()
+        elif args.task == 'test':
+            sonia_ai.predict()
+    elif args.task == 'init_dataset':
+        assert not args.src is None
+        assert not args.dataset_name is None
+        sonia_dataset = DatasetSonia(args.src, args.dataset_name, args.train_proba, args.val_proba)
+        sonia_dataset.create()
+    elif args.task == 'load_labels':
+        assert not args.dataset is None
+        assert not args.project_id is None
+        labels = LabelingSonia(args.dataset, args.project_id)
+        labels.convert_labels()
+    elif args.task == 'mix_dataset':
+        assert not args.new_dataset is None
+        assert not args.dataset_list is None
+        assert len(args.dataset_list) > 1
+        mix_datasets(args.new_dataset, args.dataset_list)
+
 
 if __name__ == "__main__":
    main()
