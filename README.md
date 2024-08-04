@@ -83,7 +83,7 @@ Instructions about how to train a model.
 The following command will start a fine tuning of the selected model, using chosen parameters and the given dataset.
 
 ```powershell
-python3 main.py --model='yolov8' --load-model='models/yolov8n.pt' --dataset='data_test' --project='robosub24' --name='my_model' --augment
+python3 main.py --task train --model='yolo' --load-model='models/yolov8n.pt' --dataset='data_example' --name='my_model' --augment
 ```
  - `--model` **mandatory**, set the chosen model (choices: ['yolov8', 'yolov9', 'yolov10']),
  - `--load-model` **mandatory**, path to the model weights (for example: models/yolov8n.pt),
@@ -198,15 +198,29 @@ Instructions about how to predict the results on one or several images.
 The following command will display the detected boxes on each test images. To see the next image, do any key. 
 
 ```powershell
-python3 main.py --inference --model='yolov8' --load-model='models/yolov8n.pt' --dataset='data_test' --inf-img-size=640 --inf-confidence=0.5
+python3 main.py --task test  --model='yolov8' --load-model='models/yolov8n.pt' --dataset='data_test' --inf-img-size=640 --inf-confidence=0.5
 ```
- - `--inference` **mandatory**, set as the mode as prediction,
  - `--model` **mandatory**, set the chosen model (choices: ['yolov8', 'yolov9', 'yolov10']),
  - `--load-model` **mandatory**, path to the model weights (for example: models/yolov8n.pt),
  - `--dataset` **mandatory**, name of the selected dataset (every dataset are in the folder **./datasets**, example: 'data_test'),
  - `--inf-confidence` **optionnal**, minimum confidence treshold (default: 0.5),
  - `--inf-img-size` **optionnal**, set the input size of images in the model (default: 640).
 
+
+### Initialize a new dataset
+Initialize a new dataset taking as source a folder containing one or more folders of images.
+This command will separate the data into training, validation and testing sets.
+
+```powershell
+python3 main.py --task init_dataset --src ../ETS/SONIA/datasets/robosub/ --train-proba .7 --val-proba .2
+```
+
+### Load labels from labelbox into an initialized dataset
+Imports labels corresponding to the dataset images from labelbox.
+
+```powershell
+python3 main.py --task load_labels --dataset data_example --project-id <your-project-id> --api-key <your-api-key>
+```
 
 ### Help
 

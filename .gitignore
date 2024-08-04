@@ -136,3 +136,9 @@ dmypy.json
 
 #Apple
 .DS_Store
+
+wandb/*
+runs/*
+config/.labelbox_api_key.txt
+config/credentials.py
+source/*
