@@ -136,3 +136,5 @@ dmypy.json
 
 #Apple
 .DS_Store
+
+wandb/*
