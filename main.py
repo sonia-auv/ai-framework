@@ -4,7 +4,7 @@ from labeling_sonia import LabelingSonia
 from dataset_sonia import DatasetSonia
 from utils import mix_datasets
         
-def parse(self):
+def parse():
     parser = argparse.ArgumentParser(description="AI SONIA Vision")
     # Choix de la tâche réalisée
     parser.add_argument('--task', 
@@ -55,7 +55,7 @@ def parse(self):
                         type=str, 
                         default=None,
                         choices=[None, 'yolo'], 
-                        help='Modèle choisi (défaut:yolov8)')
+                        help='Modèle choisi (défaut:yolo)')
     parser.add_argument('--name', 
                         type=str, 
                         default=None, 
