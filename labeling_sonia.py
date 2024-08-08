@@ -4,9 +4,10 @@ import labelbox
 from os import listdir, makedirs
 from os.path import isfile, join, exists
 
-API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjazNnNHZrd3czeTMyMDcyNTdyb201dG0xIiwib3JnYW5pemF0aW9uSWQiOiJjamRmODljNGxxdnNmMDEwMHBvdnFqeWppIiwiYXBpS2V5SWQiOiJjbHluc21sMGgwYWtlMDd3ajF3b2gwM2dwIiwic2VjcmV0IjoiM2UyNGM2NDJmYzAxZDYwZTI4MzFlOWQ3MzNiNWFlNmYiLCJpYXQiOjE3MjEwOTY4NTAsImV4cCI6MjM1MjI0ODg1MH0.P61ZVls7up7WM_mmmTmGXDT06eEBhk-vDC2ZcEbws14'
+API_KEY = ''
 PROJECT_ID = 'clyn59tv9063e07y07nku1bwx'
 
+API_KEY_PATH = './config/.labelbox_api_key.txt'
 DATASET_YAML = '/data.yaml'
 DATASET_JSON = '/data.json'
 DATASET_DIR = 'datasets/'
@@ -22,8 +23,16 @@ class LabelingSonia():
     def __init__(self, dataset, project_id):
         self.project_id = project_id
         self.dataset = dataset
+        self.__set_api_key()
         self.client = labelbox.Client(api_key=API_KEY)
         self.project = self.client.get_project(self.project_id)
+
+    def __set_api_key(self):
+        if exists(API_KEY_PATH):
+            with open(API_KEY_PATH, 'r', encoding='UTF-8') as f:
+                self.api_key = f.read()
+        else:
+            self.api_key = API_KEY
 
     def load_labels(self):
         export_task = self.project.export_v2(params={})
