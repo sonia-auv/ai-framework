@@ -5,7 +5,7 @@ from os import listdir, makedirs
 from os.path import isfile, join, exists
 
 API_KEY = ''
-PROJECT_ID = 'clyn59tv9063e07y07nku1bwx'
+PROJECT_ID = ''
 
 API_KEY_PATH = './config/.labelbox_api_key.txt'
 DATASET_YAML = '/data.yaml'
