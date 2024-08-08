@@ -28,10 +28,9 @@ class DatasetSonia():
             mkdir(self.out+'test')
             mkdir(self.out+'test/images')
         for dir in get_dirs(self.src):
-            name = dir
             temp_files = []
             for file in get_files(self.out):
-                if name in file:
+                if not '.yaml' in file and not '.json' in file:
                     temp_files.append(file)
             train = int(self.train_proba * len(temp_files))
             val = int(self.val_proba * len(temp_files))
@@ -52,7 +51,7 @@ class DatasetSonia():
             while len(files) > 0:
                 k = randint(0, len(files)-1)
                 out_name = find_name(self.out, dir)
-                move(self.src+dir+'/'+files[k], self.out+out_name)
+                move(self.src+dir+'/'+files[k], self.out+files[k])
                 files = get_files(self.src+dir)
     
     def create(self):

@@ -46,17 +46,17 @@ def find_name(path, name):
 def filename_available(path):
     return not exists(path)
 
-def mix_datasets(self):
-    assert not exists(DATASET_DIR+self.new_dataset)
-    for dataset in self.dataset_list:
+def mix_datasets(new_dataset, dataset_list):
+    assert not exists(DATASET_DIR+new_dataset)
+    for dataset in dataset_list:
         assert exists(DATASET_DIR+dataset)
 
-    makedirs(DATASET_DIR+self.new_dataset)
+    makedirs(DATASET_DIR+new_dataset)
     for sub_dir in DATASET_SUB_DIRS:
-        makedirs(DATASET_DIR+self.new_dataset+sub_dir)
+        makedirs(DATASET_DIR+new_dataset+sub_dir)
 
-    for dataset in self.dataset_list:
+    for dataset in dataset_list:
         for sub_dir in DATASET_SUB_DIRS:
             path = DATASET_DIR+dataset+sub_dir
             for file in [f for f in listdir(path) if isfile(join(path, f))]:
-                copy(path+file, DATASET_DIR+self.new_dataset+sub_dir+dataset+'_'+file)
+                copy(path+file, DATASET_DIR+new_dataset+sub_dir+dataset+'_'+file)

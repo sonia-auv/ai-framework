@@ -31,20 +31,22 @@ class LabelingSonia():
         if export_task.errors:
             print(export_task.errors)
         else:
-            with open(DATASET_DIR+self.args.dataset+'/data.json', 'w', encoding='utf-8') as f:
+            with open(DATASET_DIR+self.dataset+'/data.json', 'w', encoding='utf-8') as f:
                 json.dump(export_task.result, f, ensure_ascii=False, indent=4)
 
     def convert_labels(self):
         self.load_yaml()
+        self.load_labels()
         self.load_json()
         self.load_images()
         self.make_labels_dirs()
         self.convert_json()
 
     def load_yaml(self):
-        metadata = yaml.full_load(open(DATASET_DIR + self.dataset + DATASET_YAML, encoding='utf-8'))
-        self.class_names = list(metadata['names'].values())
-        self.class_ids = list(metadata['names'].keys())
+        with open(DATASET_DIR + self.dataset + DATASET_YAML, encoding='utf-8') as f:
+            metadata = yaml.full_load(f)
+            self.class_names = list(metadata['names'].values())
+            self.class_ids = list(metadata['names'].keys())
 
     def load_json(self):
         with open(DATASET_DIR + self.dataset + DATASET_JSON, encoding='utf-8') as f:
