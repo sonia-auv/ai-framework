@@ -4,7 +4,7 @@ import labelbox
 from os import listdir, makedirs
 from os.path import isfile, join, exists
 
-API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjazNnNHZrd3czeTMyMDcyNTdyb201dG0xIiwib3JnYW5pemF0aW9uSWQiOiJjamRmODljNGxxdnNmMDEwMHBvdnFqeWppIiwiYXBpS2V5SWQiOiJjbWM2azB3ZGkwYjJkMDcxajJxeGo5NGVzIiwic2VjcmV0IjoiZWZkYzA2ZTIwZDQzM2E4NDY5OGQ5OGMwNWI3ZmFmODAiLCJpYXQiOjE3NTA1Mjk0MjksImV4cCI6MTc1Mjk0ODYyOX0.vOPMHDbhREkyNcczzYEldiB8aD9zNHmjPzN0KZKoQrw'
+API_KEY = ''
 PROJECT_ID = ''
 
 API_KEY_PATH = './config/.labelbox_api_key.txt'
