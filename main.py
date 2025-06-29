@@ -3,6 +3,7 @@ from ai_sonia import AiSonia
 from labeling_sonia import LabelingSonia
 from dataset_sonia import DatasetSonia
 from utils import mix_datasets
+from import_dataset import import_dataset
         
 def parse():
     parser = argparse.ArgumentParser(description="AI SONIA Vision")
@@ -68,6 +69,10 @@ def parse():
                         type=str, 
                         default=None, 
                         help='Chemin du fichier de configuration du dataset')
+    parser.add_argument('--labelbox-project-name', 
+                        type=str, 
+                        default=None, 
+                        help='Nom du dataset LabelBox (défaut:None)')
     # Entraînement
     parser.add_argument('--resume', 
                         action='store_true', 
@@ -93,13 +98,14 @@ def parse():
 def main():
     args = parse()
     if args.task == 'train' or args.task == 'test':
-        assert not args.dataset is None
+        assert not args.dataset is None or not args.labelbox_project_name is None
         assert not args.model is None
-        assert not args.load_model is None
-        sonia_ai = AiSonia(args)
         if args.task == 'train':
+            args.dataset = import_dataset(dataset_name = args.labelbox_project_name, label_type = 'box', download = False)
+            sonia_ai = AiSonia(args)
             sonia_ai.train()
         elif args.task == 'test':
+            sonia_ai = AiSonia(args)
             sonia_ai.predict()
     elif args.task == 'init_dataset':
         assert not args.src is None

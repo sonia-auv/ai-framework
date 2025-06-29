@@ -12,7 +12,6 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import config.credentials as credentials
 
-API_KEY = credentials.API_KEY
 
 def save_json(filename, data):
     with open(filename, 'w', encoding='utf-8') as f:
@@ -208,7 +207,7 @@ def get_project(project_name, client):
 
 
 # label_type = 'box'  or 'obb' or 'mask' 
-def import_dataset(api_key, project_name, label_type='box', download = True):
+def download_dataset(api_key, project_name, label_type='box', download = True):
     client = labelbox.Client(api_key)
     project_id = get_project(project_name, client)
 
@@ -415,7 +414,7 @@ def save_mask(img, masks, names, labels_path):
 
 def save_set_to_dir(dataset, set_type, available_classes, dataset_path, label_type, client):
     for k, item in enumerate(dataset):
-        print('{:02f}%'.format(100 * k / len(dataset)))
+        print('{:02f}%'.format(100 * k / len(dataset)), end="\r", flush=True)
         img_name = item[0]
         img_url = item[1]
         labels = item[2]
@@ -443,19 +442,22 @@ def save_set_to_dir(dataset, set_type, available_classes, dataset_path, label_ty
 
 
 
-dataset_name = 'Robosub-2025'
-label_type = 'mask'
-download = False
 
-print("Importing dataset...")
-train_set, val_set, test_set, available_classes, dataset_path, client = import_dataset(API_KEY, dataset_name, label_type, download)
-print("Dataset imported successfully.")
 
-print("Saving train set to directory...")
-save_set_to_dir(train_set, 'train', available_classes, dataset_path, label_type, client)
+def import_dataset(dataset_name = 'robosub_24', label_type = 'box', download = False):
+    API_KEY = credentials.API_KEY
 
-print("Saving validation sets to directory...")
-save_set_to_dir(val_set, 'val', available_classes, dataset_path, label_type, client)
+    print("Importing dataset...")
+    train_set, val_set, test_set, available_classes, dataset_path, client = download_dataset(API_KEY, dataset_name, label_type, download)
+    print("Dataset imported successfully.")
 
-print("Saving test set to directory...")
-save_set_to_dir(test_set, 'test', available_classes, dataset_path, label_type, client)
+    print("Saving train set to directory...")
+    save_set_to_dir(train_set, 'train', available_classes, dataset_path, label_type, client)
+
+    print("Saving validation sets to directory...")
+    save_set_to_dir(val_set, 'val', available_classes, dataset_path, label_type, client)
+
+    print("Saving test set to directory...")
+    save_set_to_dir(test_set, 'test', available_classes, dataset_path, label_type, client)
+
+    return os.path.basename(dataset_path)

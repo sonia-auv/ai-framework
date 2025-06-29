@@ -28,8 +28,10 @@ class AiSonia():
             print('Cuda non disponible')
 
         # Loading model
-        if self.args.model in ['yolo']:
+        if self.args.model in ['yolo'] and not self.args.load_model is None:
             self.model = YOLO(self.args.load_model)
+        elif self.args.load_model is None:
+            self.model = YOLO(MODELS_DIR+'yolo/yolov8n.pt')
 
         if self.args.name is None:
             self.args.name = self.args.model
