@@ -139,6 +139,9 @@ dmypy.json
 
 wandb/*
 runs/*
+models/*
 config/.labelbox_api_key.txt
 config/credentials.py
 source/*
+rosbags/*
+temp/*
