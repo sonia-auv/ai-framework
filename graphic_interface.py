@@ -22,7 +22,7 @@ class GraphicInterface(tk.Tk):
         self.datasets_list = [(dataset.name, dataset.uid) for dataset in self.client.get_datasets()]
         self.model_list = [os.path.join(MODEL_DIR, f) for f in os.listdir(MODEL_DIR) if f.endswith('.pt')]
         self.bag_list = [os.path.join(BAG_DIR, dir) for dir in os.listdir(BAG_DIR)]
-        self.selected_bags = []
+        self.selected_bags = self.bag_list
         self.preselection_coeff = 0.1
         self.topic_list = DEFAULT_CAMERA_TOPICS
         self.selected_project = self.project_list[0][0]
@@ -56,14 +56,6 @@ class GraphicInterface(tk.Tk):
         return scroll_frame
 
 
-    def update_selected_model(self, *args):
-        self.model_path = self.model_var.get()
-
-
-    def update_selected_bags(self):
-        self.selected_bags = [path for var, path in self.bag_vars if var.get()]
-
-
     def frame_bag_layout(self):
         # Frame 1: Bag selection with checkboxes
         frame1_outer = tk.Frame(self, borderwidth=1, relief='ridge', width=550, height=400)
@@ -75,7 +67,7 @@ class GraphicInterface(tk.Tk):
         tk.Label(frame1, text='Select Bags:', font=("Arial", 12, "bold")).grid(row=0, column=0, sticky='w')
         self.bag_vars = []
         for idx, bag_path in enumerate(self.bag_list):
-            var = tk.BooleanVar(value=False)
+            var = tk.BooleanVar(value=True)
             chk = tk.Checkbutton(frame1, text=os.path.basename(bag_path), variable=var)
             chk.grid(row=idx+1, column=0, sticky='w')
             self.bag_vars.append((var, bag_path))
@@ -115,17 +107,6 @@ class GraphicInterface(tk.Tk):
         self.model_var.trace_add('write', self.update_model_var)
         # Set initial model_path
         self.model_path = None
-
-
-    def update_model_var(self, *args):
-        val = self.model_var.get()
-        self.model_path = None if val == "__none__" else val
-
-
-    def update_ontology_var(self, *args):
-        val = self.ontology_var.get()
-        self.selected_ontology = self.ontologies_list[0][0] if val == "__none__" else val 
-
 
     def frame_ontology_layout(self):
         # Frame 3: Ontology selection with radio buttons
@@ -194,17 +175,6 @@ class GraphicInterface(tk.Tk):
         self.new_project_var.trace_add('write', self.update_project_var)
 
 
-
-    def update_project_var(self, *args):
-        val = self.project_var.get()
-        if val == "__none__":
-            self.selected_project = self.project_list[0][0]
-        elif val == "__new__":
-            self.selected_project = self.new_project_var.get()
-        else :
-            self.selected_project = val 
-
-
     def frame_dataset_layout(self):
         # Frame 5: Dataset selection with radio buttons
         frame5_outer = tk.Frame(self, borderwidth=1, relief='ridge', width=550, height=400)
@@ -251,16 +221,6 @@ class GraphicInterface(tk.Tk):
         self.new_dataset_var.trace_add('write', self.update_dataset_var)
 
 
-    def update_dataset_var(self, *args):
-        val = self.dataset_var.get()
-        if val == "__none__":
-            self.selected_dataset = self.datasets_list[0][0] 
-        elif val == "__new__":
-            self.selected_dataset = self.new_dataset_var.get()
-        else:
-            self.selected_dataset = val
-
-
     def frame_topic_layout(self):
         # Frame 6: Topic selection with checkboxes
         frame6_outer = tk.Frame(self, borderwidth=1, relief='ridge', width=550, height=400)
@@ -278,15 +238,6 @@ class GraphicInterface(tk.Tk):
         for var in self.topic_vars:
             var.trace_add('write', lambda *args: self.update_selected_topics())
 
-
-    def update_selected_topics(self):
-        self.topic_list = [topic for var, topic in zip(self.topic_vars, self.topic_list) if var.get()]
-        if not self.topic_list:
-            self.topic_list = DEFAULT_CAMERA_TOPICS
-
-    
-    def update_preselection_coeff(self, *args):
-        self.preselection_coeff = self.preselection_var.get()
 
     def frame_coeff_layout(self):
         # Frame 7: Preselection coefficient slider
@@ -307,6 +258,54 @@ class GraphicInterface(tk.Tk):
         )
         slider.grid(row=1, column=0, sticky='w', padx=10)
         self.preselection_var.trace_add('write', self.update_preselection_coeff)
+
+
+    def update_model_var(self, *args):
+        val = self.model_var.get()
+        self.model_path = None if val == "__none__" else val
+
+
+    def update_selected_model(self, *args):
+        self.model_path = self.model_var.get()
+
+
+    def update_selected_bags(self):
+        self.selected_bags = [path for var, path in self.bag_vars if var.get()]
+
+
+    def update_ontology_var(self, *args):
+        val = self.ontology_var.get()
+        self.selected_ontology = self.ontologies_list[0][0] if val == "__none__" else val 
+
+
+    def update_project_var(self, *args):
+        val = self.project_var.get()
+        if val == "__none__":
+            self.selected_project = self.project_list[0][0]
+        elif val == "__new__":
+            self.selected_project = self.new_project_var.get()
+        else :
+            self.selected_project = val 
+
+
+    def update_dataset_var(self, *args):
+        val = self.dataset_var.get()
+        if val == "__none__":
+            self.selected_dataset = self.datasets_list[0][0] 
+        elif val == "__new__":
+            self.selected_dataset = self.new_dataset_var.get()
+        else:
+            self.selected_dataset = val
+
+
+    def update_selected_topics(self):
+        self.topic_list = [topic for var, topic in zip(self.topic_vars, self.topic_list) if var.get()]
+        if not self.topic_list:
+            self.topic_list = DEFAULT_CAMERA_TOPICS
+
+    
+    def update_preselection_coeff(self, *args):
+        self.preselection_coeff = self.preselection_var.get()
 
 
     def define_layout(self):

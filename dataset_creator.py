@@ -76,6 +76,7 @@ class DatasetCreator():
 
     def make_data_rows(self):
         images_files = [join(self.input_images_dir, f) for f in listdir(self.input_images_dir) if isfile(join(self.input_images_dir, f))]
+        print(f"Found {len(images_files)} images in Temporary directory.")
         self.data_rows = []
         for image_file in images_files:
             self.data_rows.append(
@@ -90,17 +91,19 @@ class DatasetCreator():
         for existing_row in existing_data_rows:
             existing_uuids.append(existing_row.external_id)
         new_data_rows = [row for row in self.data_rows if row['row_data'] not in existing_uuids]
-        
+        print(f"Found {len(new_data_rows)} new data rows to create.")
         if new_data_rows:
             task_will_succeed = self.dataset.create_data_rows(new_data_rows)
             task_will_succeed.wait_till_done()
             print(f"Created {len(new_data_rows)} new data rows.")
+            if task_will_succeed.errors:
+                print(f"Errors occurred while creating data rows: {task_will_succeed.errors}")
         else:
             print("No new data rows to create.")
         self.global_keys = [row['global_key'] for row in new_data_rows]
 
 
-    def make_batch(self, ):
+    def make_batch(self):
         batches = self.project.batches()
         count = 1
         batch_name = f"batch_{count}"
@@ -108,8 +111,8 @@ class DatasetCreator():
             count += 1
             batch_name = f"batch_{count}"
         return self.project.create_batch(name=batch_name,
-                                    global_keys=self.global_keys,
-                                    priority=1)
+                                        global_keys=self.global_keys,
+                                        priority=1)
 
 
     def predict_image_labels(self, img_path, model):
@@ -134,8 +137,9 @@ class DatasetCreator():
 
     def upload_labels(self):
         labels = []
+        model = YOLO(self.model_path)
         for key in self.global_keys:
-            annotations = self.predict_image_labels(key, YOLO(self.model_path))
+            annotations = self.predict_image_labels(key, model)
             labels.append(
                 lb_types.Label(data={"global_key": key},
                             annotations = annotations

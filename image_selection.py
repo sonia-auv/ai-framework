@@ -66,6 +66,9 @@ class ImageSelector():
         height = int(display_img.shape[0] * scale)
         display_img = cv2.resize(display_img, (width, height), interpolation=cv2.INTER_LINEAR)
 
+        num_saved = len([f for f in os.listdir(self.TEMP_DIR) if f.endswith('.png')])
+        cv2.putText(display_img, f"Saved: {num_saved}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 255, 0), 2)
+
         cv2.putText(display_img, os.path.basename(self.current_bag_path),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2)
         cv2.putText(display_img, self.current_topic,(10, 60), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2)
         # Create a named window and set its size
@@ -98,7 +101,7 @@ class ImageSelector():
                     img_array = np.frombuffer(msg.data, dtype=np.uint8)
                     img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
                     self._display_image(img)
-                    key = cv2.waitKey(300)
+                    key = cv2.waitKey(0)
                     filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 
                     path = os.path.join(os.path.expanduser(self.TEMP_DIR), filename)
                     if key == ord('y'):
@@ -118,6 +121,8 @@ class ImageSelector():
                             print(f"Removing image {path}")
                             os.remove(path)
                         i += round(1/self.preselection_coeff)
+                    elif key == 27:  # ESC key
+                        exit()
                     else:
                         self._print_help()
                 else:
