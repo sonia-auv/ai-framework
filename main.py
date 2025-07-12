@@ -1,9 +1,9 @@
 import argparse
 from ai_sonia import AiSonia
-from labeling_sonia import LabelingSonia
-from dataset_sonia import DatasetSonia
-from utils import mix_datasets
-from import_dataset import import_dataset
+from dataset_importer import Dataset_importer
+import labelbox as lb
+import config.credentials as credentials
+from graphic_interface import GraphicInterface
         
 def parse():
     parser = argparse.ArgumentParser(description="AI SONIA Vision")
@@ -11,7 +11,7 @@ def parse():
     parser.add_argument('--task', 
                         type=str, 
                         required=True, 
-                        choices=['train', 'test', 'init_dataset', 'load_labels', 'mix_dataset'], 
+                        choices=['train', 'test', 'export-data'], 
                         help='Tache réalisé')
     # Init dataset
     parser.add_argument('--src', 
@@ -31,21 +31,10 @@ def parse():
                         default=0.2, 
                         help='Proportion of val (default:0.2)')
     # Load labels
-    parser.add_argument('--project-id', 
-                        type=str, 
-                        default=None,
-                        help='Id du projet LabelBox')
-    # Mix dataset
-    # Choix du dataset
-    parser.add_argument('--new-dataset', 
-                        type=str, 
-                        default=None,
-                        help='Nom du dataset')
-    parser.add_argument('--dataset-list',
-                        '--list', 
-                        nargs='+', 
-                        default=None,
-                        help='Datasets à mélanger')
+    parser.add_argument('--labelbox-projects', 
+                        nargs='*', 
+                        default=[],
+                        help='Noms des projets LabelBox')
     # Train or test models
     # Choix du modèle
     parser.add_argument('--project', 
@@ -54,7 +43,7 @@ def parse():
                         help='Nom du projet (défaut:None)')
     parser.add_argument('--model', 
                         type=str, 
-                        default=None,
+                        default='yolo',
                         choices=[None, 'yolo'], 
                         help='Modèle choisi (défaut:yolo)')
     parser.add_argument('--name', 
@@ -69,10 +58,6 @@ def parse():
                         type=str, 
                         default=None, 
                         help='Chemin du fichier de configuration du dataset')
-    parser.add_argument('--labelbox-project-name', 
-                        type=str, 
-                        default=None, 
-                        help='Nom du dataset LabelBox (défaut:None)')
     # Entraînement
     parser.add_argument('--resume', 
                         action='store_true', 
@@ -97,31 +82,27 @@ def parse():
 
 def main():
     args = parse()
-    if args.task == 'train' or args.task == 'test':
-        assert not args.dataset is None or not args.labelbox_project_name is None
-        assert not args.model is None
-        if args.task == 'train':
-            args.dataset = import_dataset(dataset_name = args.labelbox_project_name, label_type = 'box', download = False)
-            sonia_ai = AiSonia(args)
-            sonia_ai.train()
-        elif args.task == 'test':
-            sonia_ai = AiSonia(args)
-            sonia_ai.predict()
-    elif args.task == 'init_dataset':
-        assert not args.src is None
-        assert not args.dataset_name is None
-        sonia_dataset = DatasetSonia(args.src, args.dataset_name, args.train_proba, args.val_proba)
-        sonia_dataset.create()
-    elif args.task == 'load_labels':
-        assert not args.dataset is None
-        assert not args.project_id is None
-        labels = LabelingSonia(args.dataset, args.project_id)
-        labels.convert_labels()
-    elif args.task == 'mix_dataset':
-        assert not args.new_dataset is None
-        assert not args.dataset_list is None
-        assert len(args.dataset_list) > 1
-        mix_datasets(args.new_dataset, args.dataset_list)
+    assert args.task == 'train' or args.task == 'test' or args.task == 'export-data'
+    assert not args.dataset is None or not args.labelbox_projects is None
+    assert not args.model is None
+    if args.task == 'train':
+        # importer = Dataset_importer(
+        #     client=lb.Client(api_key=credentials.API_KEY),
+        #     project_names=args.labelbox_projects, 
+        #     label_type='box', 
+        #     download=True, 
+        #     train_proba=args.train_proba, 
+        #     val_proba=args.val_proba)
+        # importer.make_dataset()
+        # args.dataset = importer.path
+        args.dataset = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_11"
+        sonia_ai = AiSonia(args)
+        sonia_ai.train()
+    elif args.task == 'test':
+        sonia_ai = AiSonia(args)
+        sonia_ai.predict()
+    elif args.task == 'export-data':
+        gui = GraphicInterface()
 
 
 if __name__ == "__main__":

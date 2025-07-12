@@ -53,7 +53,7 @@ class AiSonia():
         yaml.dump(settings, open(TEMP_YAML, 'w'))
 
     def predict(self):
-        test_path = DATASET_DIR+self.args.dataset+PATH_IMG_TEST
+        test_path = self.args.dataset+PATH_IMG_TEST
         img_list = [join(test_path, f) for f in listdir(test_path) if isfile(join(test_path, f))]
         t1 = time()
         results = self.model.predict(img_list, 
@@ -94,6 +94,6 @@ class AiSonia():
     def train(self):
         self.model.train(project=self.args.project,
                          name=self.args.name,
-                         data=DATASET_DIR+self.args.dataset+'/'+DATASET_YAML,
+                         data=join(self.args.dataset, DATASET_YAML),
                          resume=self.args.resume,
                          cfg=TEMP_YAML)

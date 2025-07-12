@@ -348,5 +348,4 @@ class GraphicInterface(tk.Tk):
 
         shutil.rmtree(selector.TEMP_DIR)
 
-
-gui = GraphicInterface()
+    
