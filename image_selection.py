@@ -9,7 +9,8 @@ API_KEY = credentials.API_KEY
 
 DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
                         '/camera_array/front/image_raw/compressed', 
-                        '/zed/zed_node/left/image_color_rect/compressed']
+                        '/zed/zed_node/left/image_rect_color/compressed', 
+                        '/zed/zed_node/right/image_rect_color/compressed']
 
 
 class ImageSelector():
@@ -59,7 +60,7 @@ class ImageSelector():
             self._deserialize_ros2_bag()
     
     
-    def _display_image(self, img):
+    def _display_image(self, img, num_images):
         display_img = img.copy()
         scale = 2
         width = int(display_img.shape[1] * scale)
@@ -67,7 +68,7 @@ class ImageSelector():
         display_img = cv2.resize(display_img, (width, height), interpolation=cv2.INTER_LINEAR)
 
         num_saved = len([f for f in os.listdir(self.TEMP_DIR) if f.endswith('.png')])
-        cv2.putText(display_img, f"Saved: {num_saved}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 255, 0), 2)
+        cv2.putText(display_img, f"Saved: {num_saved}/{num_images}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 255, 0), 2)
 
         cv2.putText(display_img, os.path.basename(self.current_bag_path),(10, 30), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2)
         cv2.putText(display_img, self.current_topic,(10, 60), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2)
@@ -83,8 +84,10 @@ class ImageSelector():
                 return 'bottom'
             case '/camera_array/front/image_raw/compressed':
                 return 'front'
-            case '/zed/zed_node/left/image_color_rect/compressed':
+            case '/zed/zed_node/left/image_rect_color/compressed':
                 return 'zed_left'
+            case '/zed/zed_node/right/image_rect_color/compressed':
+                return 'zed_right'
 
 
     def _deserialize_ros2_bag(self):
@@ -100,7 +103,7 @@ class ImageSelector():
                     msg = typestore.deserialize_cdr(rawdata, connection.msgtype)
                     img_array = np.frombuffer(msg.data, dtype=np.uint8)
                     img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-                    self._display_image(img)
+                    self._display_image(img, int(len(rawdata)*self.preselection_coeff))
                     key = cv2.waitKey(0)
                     filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 
                     path = os.path.join(os.path.expanduser(self.TEMP_DIR), filename)
