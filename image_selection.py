@@ -79,15 +79,14 @@ class ImageSelector():
 
 
     def _simplified_topic(self):
-        match self.current_topic:
-            case '/camera_array/bottom/image_raw/compressed':
-                return 'bottom'
-            case '/camera_array/front/image_raw/compressed':
-                return 'front'
-            case '/zed/zed_node/left/image_rect_color/compressed':
-                return 'zed_left'
-            case '/zed/zed_node/right/image_rect_color/compressed':
-                return 'zed_right'
+        if self.current_topic == '/camera_array/bottom/image_raw/compressed':
+            return 'bottom'
+        elif self.current_topic == '/camera_array/front/image_raw/compressed':
+            return 'front'
+        elif self.current_topic == '/zed/zed_node/left/image_rect_color/compressed':
+            return 'zed_left'
+        elif self.current_topic == '/zed/zed_node/right/image_rect_color/compressed':
+            return 'zed_right'
 
 
     def _deserialize_ros2_bag(self):
