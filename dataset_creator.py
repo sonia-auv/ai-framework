@@ -171,15 +171,3 @@ class DatasetCreator():
         if self.model_path is not None:
             self.upload_labels()
 
-
-# PROJECT_NAME = "photos-local"
-# ONTOLOGY_NAME = 'Robosub-2025-box'
-# DATASET_NAME = "photos-local-dataset"
-# INPUT_IMAGES_DIR = "source/photos-local"
-# MODEL_PATH = None 
-
-
-# client = lb.Client(api_key=API_KEY)
-
-# dataset_creator = DatasetCreator(client, PROJECT_NAME, ONTOLOGY_NAME, DATASET_NAME, INPUT_IMAGES_DIR, MODEL_PATH)
-
