@@ -95,7 +95,6 @@ def main():
             val_proba=args.val_proba)
         importer.make_dataset()
         args.dataset = importer.path
-        args.dataset = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_11"
         sonia_ai = AiSonia(args)
         sonia_ai.train()
     elif args.task == 'test':
