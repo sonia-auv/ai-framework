@@ -243,20 +243,20 @@ class Dataset_importer:
 
 
 
-def import_dataset(dataset_name = 'robosub_24', label_type = 'box', download = False):
-    API_KEY = credentials.API_KEY
+# def import_dataset(dataset_name = 'robosub_24', label_type = 'box', download = False):
+#     API_KEY = credentials.API_KEY
 
-    print("Importing dataset...")
-    train_set, val_set, test_set, available_classes, dataset_path, client = download_dataset(API_KEY, dataset_name, label_type, download)
-    print("Dataset imported successfully.")
+#     print("Importing dataset...")
+#     train_set, val_set, test_set, available_classes, dataset_path, client = download_dataset(API_KEY, dataset_name, label_type, download)
+#     print("Dataset imported successfully.")
 
-    print("Saving train set to directory...")
-    save_set_to_dir(train_set, 'train', available_classes, dataset_path, label_type, client)
+#     print("Saving train set to directory...")
+#     save_set_to_dir(train_set, 'train', available_classes, dataset_path, label_type, client)
 
-    print("Saving validation sets to directory...")
-    save_set_to_dir(val_set, 'val', available_classes, dataset_path, label_type, client)
+#     print("Saving validation sets to directory...")
+#     save_set_to_dir(val_set, 'val', available_classes, dataset_path, label_type, client)
 
-    print("Saving test set to directory...")
-    save_set_to_dir(test_set, 'test', available_classes, dataset_path, label_type, client)
+#     print("Saving test set to directory...")
+#     save_set_to_dir(test_set, 'test', available_classes, dataset_path, label_type, client)
 
-    return os.path.basename(dataset_path)
+#     return os.path.basename(dataset_path)
