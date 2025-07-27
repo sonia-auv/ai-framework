@@ -86,15 +86,15 @@ def main():
     assert not args.dataset is None or not args.labelbox_projects is None
     assert not args.model is None
     if args.task == 'train':
-        # importer = Dataset_importer(
-        #     client=lb.Client(api_key=credentials.API_KEY),
-        #     project_names=args.labelbox_projects, 
-        #     label_type='box', 
-        #     download=True, 
-        #     train_proba=args.train_proba, 
-        #     val_proba=args.val_proba)
-        # importer.make_dataset()
-        # args.dataset = importer.path
+        importer = Dataset_importer(
+            client=lb.Client(api_key=credentials.API_KEY),
+            project_names=args.labelbox_projects, 
+            label_type='box', 
+            download=True, 
+            train_proba=args.train_proba, 
+            val_proba=args.val_proba)
+        importer.make_dataset()
+        args.dataset = importer.path
         args.dataset = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_11"
         sonia_ai = AiSonia(args)
         sonia_ai.train()
