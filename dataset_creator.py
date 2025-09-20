@@ -4,7 +4,6 @@ import labelbox.types as lb_types
 from os import listdir
 from os.path import isfile, join
 import cv2
-import numpy as np
 from ultralytics import YOLO
 from uuid import uuid4
         

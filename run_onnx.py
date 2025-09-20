@@ -7,9 +7,9 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 import torch
+import yaml
+import os
 
-from ultralytics.utils import ASSETS, YAML
-from ultralytics.utils.checks import check_requirements, check_yaml
 
 
 class YOLOv8:
@@ -45,26 +45,29 @@ class YOLOv8:
         >>> output_image = detector.main()
     """
 
-    def __init__(self, onnx_model: str, input_image: str, confidence_thres: float, iou_thres: float):
+    def __init__(self, onnx_model: str, confidence_thres: float, iou_thres: float):
         """
         Initialize an instance of the YOLOv8 class.
 
         Args:
             onnx_model (str): Path to the ONNX model.
-            input_image (str): Path to the input image.
             confidence_thres (float): Confidence threshold for filtering detections.
             iou_thres (float): IoU threshold for non-maximum suppression.
         """
-        self.onnx_model = onnx_model
-        self.input_image = input_image
+        self.onnx_model = "models/"+onnx_model+"/"+onnx_model+".onnx"
+        self.input_image = None
+        self.draw = False
         self.confidence_thres = confidence_thres
         self.iou_thres = iou_thres
 
         # Load the class names from the COCO dataset
-        self.classes = YAML.load(check_yaml("coco8.yaml"))["names"]
-
+        with open("models/"+onnx_model+"/data.yaml", 'r') as stream:
+            self.classes = yaml.safe_load(stream)["names"]
         # Generate a color palette for the classes
         self.color_palette = np.random.uniform(0, 255, size=(len(self.classes), 3))
+
+        # Create an inference session using the ONNX model and specify execution providers
+        self.session = ort.InferenceSession(self.onnx_model, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
 
     def letterbox(self, img: np.ndarray, new_shape: Tuple[int, int] = (640, 640)) -> Tuple[np.ndarray, Tuple[int, int]]:
         """
@@ -219,31 +222,44 @@ class YOLOv8:
         # Apply non-maximum suppression to filter out overlapping bounding boxes
         indices = cv2.dnn.NMSBoxes(boxes, scores, self.confidence_thres, self.iou_thres)
 
+        detections = DetectionArray()
+        detections.detected_object = []
         # Iterate over the selected indices after non-maximum suppression
         for i in indices:
-            # Get the box, score, and class ID corresponding to the index
-            box = boxes[i]
-            score = scores[i]
-            class_id = class_ids[i]
+            classif = Detection()
+            classif.top_left_x = float(boxes[i][0])
+            classif.top_left_y = float(boxes[i][1])
+            classif.top_right_x = float(boxes[i][0])
+            classif.top_right_y = float(boxes[i][3])
+            classif.bottom_right_x = float(boxes[i][2])
+            classif.bottom_right_y = float(boxes[i][3])
+            classif.bottom_left_x = float(boxes[i][2])
+            classif.bottom_left_y = float(boxes[i][1])
+            classif.confidence = float(scores[i])
+            
+            
+            if self.draw:
+                # Get the box, score, and class ID corresponding to the index
+                box = boxes[i]
+                score = scores[i]
+                class_id = class_ids[i]
+                # Draw the detection on the input image
+                self.draw_detections(input_image, box, score, class_id)
 
-            # Draw the detection on the input image
-            self.draw_detections(input_image, box, score, class_id)
+        # Return the results
+        return detections
 
-        # Return the modified input image
-        return input_image
-
-    def main(self) -> np.ndarray:
+    def detect(self, image_path) -> np.ndarray:
         """
         Perform inference using an ONNX model and return the output image with drawn detections.
 
         Returns:
             (np.ndarray): The output image with drawn detections.
         """
-        # Create an inference session using the ONNX model and specify execution providers
-        session = ort.InferenceSession(self.onnx_model, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+        self.input_image = image_path
 
         # Get the model inputs
-        model_inputs = session.get_inputs()
+        model_inputs = self.session.get_inputs()
 
         # Store the shape of the input for later use
         input_shape = model_inputs[0].shape
@@ -254,7 +270,7 @@ class YOLOv8:
         img_data, pad = self.preprocess()
 
         # Run inference using the preprocessed image data
-        outputs = session.run(None, {model_inputs[0].name: img_data})
+        outputs = self.session.run(None, {model_inputs[0].name: img_data})
 
         # Perform post-processing on the outputs to obtain output image
         return self.postprocess(self.img, outputs, pad)
@@ -263,24 +279,27 @@ class YOLOv8:
 if __name__ == "__main__":
     # Create an argument parser to handle command-line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="yolov8n.onnx", help="Input your ONNX model.")
-    parser.add_argument("--img", type=str, default=str(ASSETS / "bus.jpg"), help="Path to input image.")
+    parser.add_argument("--model", type=str, default="model-test-1", help="Input your ONNX model.")
+    parser.add_argument("--img", type=str, default="", help="Path to input image.")
     parser.add_argument("--conf-thres", type=float, default=0.5, help="Confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.5, help="NMS IoU threshold")
     args = parser.parse_args()
 
-    # Check the requirements and select the appropriate backend (CPU or GPU)
-    check_requirements("onnxruntime-gpu" if torch.cuda.is_available() else "onnxruntime")
+    # # Check the requirements and select the appropriate backend (CPU or GPU)
+    # check_requirements("onnxruntime-gpu" if torch.cuda.is_available() else "onnxruntime")
 
     # Create an instance of the YOLOv8 class with the specified arguments
-    detection = YOLOv8(args.model, args.img, args.conf_thres, args.iou_thres)
+    detection = YOLOv8(model, 0.4, 1)
 
-    # Perform object detection and obtain the output image
-    output_image = detection.main()
+    img_dir = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_nimai-all_1/test/images/"
+    img_paths = [img_dir+f for f in os.listdir(img_dir)]
+    for img_path in img_paths:
+        # Perform object detection and obtain the output image
+        output_image = detection.detect(img_path)
 
-    # Display the output image in a window
-    cv2.namedWindow("Output", cv2.WINDOW_NORMAL)
-    cv2.imshow("Output", output_image)
+        # Display the output image in a window
+        cv2.namedWindow("Output", cv2.WINDOW_NORMAL)
+        cv2.imshow("Output", output_image)
 
-    # Wait for a key press to exit
-    cv2.waitKey(0)
+        # Wait for a key press to exit
+        cv2.waitKey(0)

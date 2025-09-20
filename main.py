@@ -95,8 +95,8 @@ def main():
             val_proba=args.val_proba)
         importer.make_dataset()
         args.dataset = importer.path
-        sonia_ai = AiSonia(args)
-        sonia_ai.train()
+        # sonia_ai = AiSonia(args)
+        # sonia_ai.train()
     elif args.task == 'test':
         sonia_ai = AiSonia(args)
         sonia_ai.predict()

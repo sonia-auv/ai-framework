@@ -10,7 +10,9 @@ API_KEY = credentials.API_KEY
 DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
                         '/camera_array/front/image_raw/compressed', 
                         '/zed/zed_node/left/image_rect_color/compressed', 
-                        '/zed/zed_node/right/image_rect_color/compressed']
+                        '/zed/zed_node/right/image_rect_color/compressed',
+                        '/proc_simulation/bottom/compressed',
+                        '/proc_simulation/front/compressed']
 
 
 class ImageSelector():
@@ -30,6 +32,7 @@ class ImageSelector():
         self.bag_path_list = bag_paths
         self.preselection_coeff = preselection_coeff
         self.topic_list = topic_list
+        self.clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8,8))
 
 
     
@@ -88,6 +91,18 @@ class ImageSelector():
                 return 'zed_left'
             case '/zed/zed_node/right/image_rect_color/compressed':
                 return 'zed_right'
+            case '/proc_simulation/bottom/compressed':
+                return 'sim_bottom'
+            case '/proc_simulation/front/compressed':
+                return 'sim_front'
+
+
+    def preprocess_image(self, img):
+        ycrcb_img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2YCrCb)
+        y, cr, cb = cv2.split(ycrcb_img)
+        y_clahe = self.clahe.apply(y)
+        clahe_ycrcb = cv2.merge([y_clahe, cr, cb])
+        return cv2.cvtColor(clahe_ycrcb, cv2.COLOR_YCrCb2BGR)
 
 
     def _deserialize_ros2_bag(self):
@@ -102,7 +117,7 @@ class ImageSelector():
                 if connection.topic == self.current_topic:
                     msg = typestore.deserialize_cdr(rawdata, connection.msgtype)
                     img_array = np.frombuffer(msg.data, dtype=np.uint8)
-                    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+                    img = self.preprocess_image(cv2.imdecode(img_array, cv2.IMREAD_COLOR))
                     self._display_image(img, int(i*self.preselection_coeff), int(len(messages)*self.preselection_coeff))
                     key = cv2.waitKey(0)
                     filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 

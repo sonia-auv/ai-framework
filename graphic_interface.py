@@ -11,7 +11,9 @@ MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models')
 DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
                         '/camera_array/front/image_raw/compressed', 
                         '/zed/zed_node/left/image_rect_color/compressed', 
-                        '/zed/zed_node/right/image_rect_color/compressed']
+                        '/zed/zed_node/right/image_rect_color/compressed',
+                        '/proc_simulation/bottom/compressed',
+                        '/proc_simulation/front/compressed']
 
 
 class GraphicInterface(tk.Tk):
@@ -68,7 +70,7 @@ class GraphicInterface(tk.Tk):
         tk.Label(frame1, text='Select Bags:', font=("Arial", 12, "bold")).grid(row=0, column=0, sticky='w')
         self.bag_vars = []
         for idx, bag_path in enumerate(self.bag_list):
-            var = tk.BooleanVar(value=True)
+            var = tk.BooleanVar(value=False)
             chk = tk.Checkbutton(frame1, text=os.path.basename(bag_path), variable=var)
             chk.grid(row=idx+1, column=0, sticky='w')
             self.bag_vars.append((var, bag_path))
