@@ -37,6 +37,8 @@
  - Rouler ```python3 main.py --task train --labelbox-projects nom_projet_1 nom_projet_2 nom_projet_3```
  - Attendre que ça roule
 
+---
+
 ## Getting Started
 
 These instructions will show you how to set up and train our AUV vision model.
