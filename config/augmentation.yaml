@@ -39,6 +39,7 @@ copy_paste: 0.0 # (float) segment copy-paste (probability).
 # No idea whether these transformation improves learning or not, we need to test it.
 auto_augment: None # (str) auto augmentation policy for classification (randaugment, autoaugment, augmix).
 
+#À tester!!! faire un script qui lance des entrainements qui changes les params 1 a 1 pour tester (pas excesif) 
 # No idea whether these transformation improves learning or not, we need to test it.
 erasing: 0.0 # (float) probability of random erasing during classification training (0-1).
 

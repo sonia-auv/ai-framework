@@ -166,7 +166,9 @@ class DatasetCreator():
         self.make_data_rows()
         self.create_data_rows()
         print("Data rows uploaded")
-        self.make_batch()
+        self.make_batch() # permet de faire le lien entrele projet et la datarow 
+        # ---------------------------------------------------------------------------
+        # dataset pret modele 
         if self.model_path is not None:
-            self.upload_labels()
+            self.upload_labels() # envoie le dataset 
 

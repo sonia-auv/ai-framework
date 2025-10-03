@@ -337,7 +337,7 @@ class GraphicInterface(tk.Tk):
         print(self.selected_bags)
 
         selector = ImageSelector(self.selected_bags, self.preselection_coeff, self.topic_list)
-        selector.manage_all_bags()
+        selector.manage_all_bags() # creer l UI 
 
         print("Image selection completed. Proceeding to dataset creation...")
         dataset_creator = DatasetCreator(self.client, 
@@ -345,9 +345,9 @@ class GraphicInterface(tk.Tk):
                                          self.selected_ontology, 
                                          self.selected_dataset, 
                                          selector.TEMP_DIR, 
-                                         self.model_path)
-        dataset_creator.create_dataset()
+                                         self.model_path) # va recuperer temp dir 
+        dataset_creator.create_dataset() # creer le dataset
 
-        shutil.rmtree(selector.TEMP_DIR)
+        shutil.rmtree(selector.TEMP_DIR) 
 
     

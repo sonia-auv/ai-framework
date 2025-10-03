@@ -100,7 +100,7 @@ def main():
     elif args.task == 'test':
         sonia_ai = AiSonia(args)
         sonia_ai.predict()
-    elif args.task == 'export-data':
+    elif args.task == 'export-data': # lance l'interface graphique
         gui = GraphicInterface()
 
 

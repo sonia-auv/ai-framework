@@ -34,7 +34,7 @@ class ImageSelector():
         self.topic_list = topic_list
         self.clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8,8))
 
-
+    
     
     def manage_all_bags(self):
         """
