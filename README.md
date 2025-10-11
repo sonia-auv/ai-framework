@@ -1,5 +1,44 @@
 # Sonia Artificial Intelligence
 
+## Tuto utilisation AI
+
+### Export des bags
+
+ - Avoir une connection internet
+ - Dans *ai-framework/config/credentials.py*, avoir mis son API key pour labelbox, exemple : ```API_KEY = "valeur_de_l_api_key_labelbox"```
+ - Si il n'existe pas, créer le dossier *ai-framework/models/*
+   - Si tu as des models, les mettre dans ce dossier, ca donnerait : *ai-framework/models/nom_du_model/model.onnx* et *ai-framework/models/nom_du_model/data.yaml* 
+ - Si il n'existe pas, créer le dossier *ai-framework/rosbags/*
+ - Mettre les bags dans le dossier *ai-framework/rosbags/*
+   - Ca donne : *ai-framework/rosbags/nom_du_bag/nom_du_bag_0.db3* et *ai-framework/rosbags/nom_du_bag/metadata.yaml* 
+ - Rouler ```python3 main.py --task export-data```
+ - Dans l'interface qui s'ouvre :
+   - Sélectionner les bags que tu veux (n'en met pas trop d'un coup c'est gourmand en RAM),
+   - Laisser tous les topics sélectionnés (sauf si tu veux en retirer certains),
+   - Si tu as des modèles tu peux les sélectionner mais c'est pas nécessaire,
+   - Sélectionner le projet sur Labelbox dans lequel envoyer les images, ATTENTION NE PAS RAJOUTER DES IMAGES DE TEST AUX PROJETS DE COMPÉ -> DANS LE DOUTE CRÉER UN NOUVEAU PROJET
+   - Sélectionner le dataset sur Labelbox dans lequel envoyer les images, ATTENTION NE PAS RAJOUTER DES IMAGES DE TEST AUX DATASETS DE COMPÉ -> DANS LE DOUTE CRÉER UN NOUVEAU DATASET
+   - L'ontologie permet de sélectionner les labels que tu utiliseras pour annoter,
+   - Pour le coefficient, met ce que tu veux c'est la proportion d'images que tu vas préselectionner le bag fait 20 images par secondes,
+   - Enfin : faire launch.
+
+ - Sélection des images:
+   - Touche "y" pour sélectionner l'image et passer au suivant,
+   - Touche "n" pour ne pas sélectionner et passer au suivant,
+   - Touche "p" revenir au précédent et le dé-selectionner,
+   - Touche "q" pour quitter la sélection avant d'avoir traité toutes les images.
+
+ - Attendre que l'export se fasse, ne pas couper la connection réseau.
+
+### Lancement d'un entrainement
+
+ - Avoir une connection internet
+ - Choisir les projet sur labelbox que tu veux utiliser
+ - Rouler ```python3 main.py --task train --labelbox-projects nom_projet_1 nom_projet_2 nom_projet_3```
+ - Attendre que ça roule
+
+---
+
 ## Getting Started
 
 These instructions will show you how to set up and train our AUV vision model.
