@@ -147,3 +147,5 @@ rosbags/*
 temp/*
 temp_no_preprocessed/*
 models/*
+
+.idea/
