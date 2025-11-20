@@ -7,7 +7,7 @@ from os import listdir
 from os.path import isfile, join
 
 CONFIG_DIR = 'config/'
-MODELS_DIR = 'models/'
+MODELS_DIR = '/home/sonia/ai/ai-framework/models/'
 DATASET_DIR = 'datasets/'
 PATH_IMG_TEST = '/test/images'
 
@@ -31,7 +31,7 @@ class AiSonia():
         if self.args.model in ['yolo'] and not self.args.load_model is None:
             self.model = YOLO(self.args.load_model)
         elif self.args.load_model is None:
-            self.model = YOLO(MODELS_DIR + 'yolo/yolov8n.pt')
+            self.model = YOLO(MODELS_DIR + 'yolo/yolo11l.pt')
 
         if self.args.name is None:
             self.args.name = self.args.model
