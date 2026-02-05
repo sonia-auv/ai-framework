@@ -9,60 +9,56 @@ from PIL import ImageFont
 from PIL import Image
 
 
-DATASET_YAML = '/data.yaml'
-DATASET_DIR = 'datasets/'
-DATASET_SUB_DIRS = ['/train/images/',
-                    '/val/images/',
-                    '/test/images/',
-                    '/train/labels/',
-                    '/val/labels/',
-                    '/test/labels/']
-
+DATASET_YAML = "/data.yaml"
+DATASET_DIR = "datasets/"
+DATASET_SUB_DIRS = [
+    "/train/images/",
+    "/val/images/",
+    "/test/images/",
+    "/train/labels/",
+    "/val/labels/",
+    "/test/labels/",
+]
 
 
 def create_filename(name, number, lenght=4):
     nb_zeros = lenght - len(str(number))
-    temp = ''
+    temp = ""
     for _ in range(nb_zeros):
-        temp += '0'
-    return name+'_'+temp+str(number)+'.jpg'
+        temp += "0"
+    return name + "_" + temp + str(number) + ".jpg"
 
 
 def box_to_obb(box):
-    left = box['left']
-    top = box['top']
-    width = box['width']
-    height = box['height']
+    left = box["left"]
+    top = box["top"]
+    width = box["width"]
+    height = box["height"]
     center_x = left + width / 2
     center_y = top + height / 2
     return {
-        'cx': center_x,
-        'cy': center_y,
-        'w': width,
-        'h': height,
-        'angle': 0.0  # Assuming no rotation for simplicity
+        "cx": center_x,
+        "cy": center_y,
+        "w": width,
+        "h": height,
+        "angle": 0.0,  # Assuming no rotation for simplicity
     }
 
 
 def polygon_to_box(polygon):
-    x_coords = [point['x'] for point in polygon]
-    y_coords = [point['y'] for point in polygon]
+    x_coords = [point["x"] for point in polygon]
+    y_coords = [point["y"] for point in polygon]
     left = min(x_coords)
     top = min(y_coords)
     right = max(x_coords)
     bottom = max(y_coords)
     width = right - left
     height = bottom - top
-    return {
-        'left': left,
-        'top': top,
-        'width': width,
-        'height': height
-    }
+    return {"left": left, "top": top, "width": width, "height": height}
 
 
 def polygon_to_obb(polygon):
-    polygon_points = [(point['x'], point['y']) for point in polygon]
+    polygon_points = [(point["x"], point["y"]) for point in polygon]
     poly = Polygon(polygon_points)
     min_rect = poly.minimum_rotated_rectangle
     rect_coords = list(min_rect.exterior.coords)[:-1]  # last point is same as first
@@ -76,13 +72,7 @@ def polygon_to_obb(polygon):
     height = np.linalg.norm(edge2)
     angle = np.degrees(np.arctan2(edge1[1], edge1[0]))
 
-    return {
-        'cx': cx,
-        'cy': cy,
-        'w': width,
-        'h': height,
-        'angle': angle
-    }
+    return {"cx": cx, "cy": cy, "w": width, "h": height, "angle": angle}
 
 
 def mask_to_box(mask):
@@ -95,10 +85,10 @@ def mask_to_box(mask):
     width = right - left + 1
     height = bottom - top + 1
     return {
-        'left': int(left),
-        'top': int(top),
-        'width': int(width),
-        'height': int(height)
+        "left": int(left),
+        "top": int(top),
+        "width": int(width),
+        "height": int(height),
     }
 
 
@@ -118,56 +108,49 @@ def mask_to_obb(mask):
     width = np.linalg.norm(edge1)
     height = np.linalg.norm(edge2)
     angle = np.degrees(np.arctan2(edge1[1], edge1[0]))
-    return {
-        'cx': cx,
-        'cy': cy,
-        'w': width,
-        'h': height,
-        'angle': angle
-    }
-
+    return {"cx": cx, "cy": cy, "w": width, "h": height, "angle": angle}
 
 
 def save_img_with_boxes(img, boxes, names, image_with_labels_path):
     for i in range(len(boxes)):
-        top = boxes[i]['top']
-        left = boxes[i]['left']
-        height = boxes[i]['height']
-        width = boxes[i]['width']
-        
+        top = boxes[i]["top"]
+        left = boxes[i]["left"]
+        height = boxes[i]["height"]
+        width = boxes[i]["width"]
+
         draw = ImageDraw.Draw(img)
         draw.rectangle([left, top, left + width, top + height], outline="red", width=2)
         # Write class name on the rectangle
         font_size = 16
         text_y = top - font_size if top - font_size > 0 else top + 2
         draw.text((left, text_y), names[i], fill="red", font=ImageFont.load_default())
-        
-    with open(image_with_labels_path, 'w', encoding='utf-8') as f:
-        Image.Image.save(img, f, format='JPEG')
+
+    with open(image_with_labels_path, "w", encoding="utf-8") as f:
+        Image.Image.save(img, f, format="JPEG")
 
 
 def save_boxes(img, boxes, names, labels_path, available_classes):
-    label_file_content = ''
+    label_file_content = ""
     img_width, img_height = img.size
     for i in range(len(boxes)):
-        top = boxes[i]['top']
-        left = boxes[i]['left']
-        height = boxes[i]['height']
-        width = boxes[i]['width']
+        top = boxes[i]["top"]
+        left = boxes[i]["left"]
+        height = boxes[i]["height"]
+        width = boxes[i]["width"]
 
-        label_file_content += f'{available_classes.index(names[i])} {(left + (width / 2)) / img_width} {(top + (height / 2)) / img_height} {width / img_width} {height / img_height}\n'
-    
-    with open(labels_path, 'w', encoding='utf-8') as f:
+        label_file_content += f"{available_classes.index(names[i])} {(left + (width / 2)) / img_width} {(top + (height / 2)) / img_height} {width / img_width} {height / img_height}\n"
+
+    with open(labels_path, "w", encoding="utf-8") as f:
         f.write(label_file_content)
 
 
 def save_img_with_obb(img, obbs, names, image_with_labels_path):
     for i in range(len(obbs)):
-        cx = obbs[i]['cx']
-        cy = obbs[i]['cy']
-        w = obbs[i]['w']
-        h = obbs[i]['h']
-        angle = obbs[i]['angle']
+        cx = obbs[i]["cx"]
+        cy = obbs[i]["cy"]
+        w = obbs[i]["w"]
+        h = obbs[i]["h"]
+        angle = obbs[i]["angle"]
 
         # Draw OBB on image
         theta = np.deg2rad(angle)
@@ -176,12 +159,7 @@ def save_img_with_obb(img, obbs, names, image_with_labels_path):
         dx = w / 2
         dy = h / 2
         # Four corners relative to center
-        corners = [
-            (-dx, -dy),
-            (dx, -dy),
-            (dx, dy),
-            (-dx, dy)
-        ]
+        corners = [(-dx, -dy), (dx, -dy), (dx, dy), (-dx, dy)]
         # Rotate and translate corners
         box_points = []
         for x, y in corners:
@@ -193,37 +171,42 @@ def save_img_with_obb(img, obbs, names, image_with_labels_path):
         # Write class name near the first corner of the OBB
         font_size = 16
         text_x, text_y = box_points[0]
-        draw.text((text_x, text_y - font_size if text_y - font_size > 0 else text_y + 2), names[i], fill="blue", font=ImageFont.load_default())
+        draw.text(
+            (text_x, text_y - font_size if text_y - font_size > 0 else text_y + 2),
+            names[i],
+            fill="blue",
+            font=ImageFont.load_default(),
+        )
 
-    with open(image_with_labels_path, 'w', encoding='utf-8') as f:
-        Image.Image.save(img, f, format='JPEG')
+    with open(image_with_labels_path, "w", encoding="utf-8") as f:
+        Image.Image.save(img, f, format="JPEG")
 
 
 def save_obb(img, obbs, names, labels_path, available_classes):
-    label_file_content = ''
+    label_file_content = ""
     img_width, img_height = img.size
     for i in range(len(obbs)):
-        cx = obbs[i]['cx']
-        cy = obbs[i]['cy']
-        w = obbs[i]['w']
-        h = obbs[i]['h']
-        angle = obbs[i]['angle']
+        cx = obbs[i]["cx"]
+        cy = obbs[i]["cy"]
+        w = obbs[i]["w"]
+        h = obbs[i]["h"]
+        angle = obbs[i]["angle"]
         class_idx = available_classes.index(names[i])
 
         # Normalize values for YOLO OBB format: class cx cy w h angle
         label_file_content += f"{class_idx} {cx / img_width} {cy / img_height} {w / img_width} {h / img_height} {angle}\n"
 
-    with open(labels_path, 'w', encoding='utf-8') as f:
+    with open(labels_path, "w", encoding="utf-8") as f:
         f.write(label_file_content)
 
 
 def save_img_with_mask(img, masks, names, image_with_labels_path, client):
     color_map = {
         name: (
-            (hash(name) & 0xFF), 
-            ((hash(name) >> 8) & 0xFF), 
-            ((hash(name) >> 16) & 0xFF), 
-            200  # alpha
+            (hash(name) & 0xFF),
+            ((hash(name) >> 8) & 0xFF),
+            ((hash(name) >> 16) & 0xFF),
+            200,  # alpha
         )
         for name in set(names)
     }
@@ -245,7 +228,9 @@ def save_img_with_mask(img, masks, names, image_with_labels_path, client):
             continue
         top, _ = np.where(rows)[0][[0, -1]]
         left, _ = np.where(cols)[0][[0, -1]]
-        mask_rgba = Image.fromarray(np.uint8(mask_array) * 255, mode="L").convert("RGBA")
+        mask_rgba = Image.fromarray(np.uint8(mask_array) * 255, mode="L").convert(
+            "RGBA"
+        )
         overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
         color = color_map.get(names[i], (0, 255, 0, 200))  # fallback to green
         for y in range(mask_rgba.height):
@@ -257,10 +242,15 @@ def save_img_with_mask(img, masks, names, image_with_labels_path, client):
         # Write class name at the top-left of the mask
         draw = ImageDraw.Draw(img)
         font_size = 16
-        draw.text((left, top - font_size if top - font_size > 0 else top + 2), names[i], fill=color[:3], font=ImageFont.load_default())
+        draw.text(
+            (left, top - font_size if top - font_size > 0 else top + 2),
+            names[i],
+            fill=color[:3],
+            font=ImageFont.load_default(),
+        )
 
-    with open(image_with_labels_path, 'w', encoding='utf-8') as f:
-        Image.Image.save(img, f, format='JPEG')
+    with open(image_with_labels_path, "w", encoding="utf-8") as f:
+        Image.Image.save(img, f, format="JPEG")
 
 
 def save_mask(img, masks, names, labels_path):

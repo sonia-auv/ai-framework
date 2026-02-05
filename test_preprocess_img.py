@@ -2,9 +2,12 @@ import cv2
 import numpy as np
 from os import listdir
 
-clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8,8))
+clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
 
-img_list = ["/home/raph/ai-framework/temp_no_preprocessed/"+f for f in listdir("/home/raph/ai-framework/temp_no_preprocessed/") ]
+img_list = [
+    "/home/raph/ai-framework/temp_no_preprocessed/" + f
+    for f in listdir("/home/raph/ai-framework/temp_no_preprocessed/")
+]
 
 for img_path in img_list:
     img = cv2.imread(img_path)
