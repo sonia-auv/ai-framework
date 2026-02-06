@@ -11,7 +11,6 @@ import yaml
 import os
 
 
-
 class YOLOv8:
     """
     YOLOv8 object detection model class for handling ONNX inference and visualization.
@@ -54,22 +53,26 @@ class YOLOv8:
             confidence_thres (float): Confidence threshold for filtering detections.
             iou_thres (float): IoU threshold for non-maximum suppression.
         """
-        self.onnx_model = "models/"+onnx_model+"/"+onnx_model+".onnx"
+        self.onnx_model = "models/" + onnx_model + "/" + onnx_model + ".onnx"
         self.input_image = None
         self.draw = False
         self.confidence_thres = confidence_thres
         self.iou_thres = iou_thres
 
         # Load the class names from the COCO dataset
-        with open("models/"+onnx_model+"/data.yaml", 'r') as stream:
+        with open("models/" + onnx_model + "/data.yaml", "r") as stream:
             self.classes = yaml.safe_load(stream)["names"]
         # Generate a color palette for the classes
         self.color_palette = np.random.uniform(0, 255, size=(len(self.classes), 3))
 
         # Create an inference session using the ONNX model and specify execution providers
-        self.session = ort.InferenceSession(self.onnx_model, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+        self.session = ort.InferenceSession(
+            self.onnx_model, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+        )
 
-    def letterbox(self, img: np.ndarray, new_shape: Tuple[int, int] = (640, 640)) -> Tuple[np.ndarray, Tuple[int, int]]:
+    def letterbox(
+        self, img: np.ndarray, new_shape: Tuple[int, int] = (640, 640)
+    ) -> Tuple[np.ndarray, Tuple[int, int]]:
         """
         Resize and reshape images while maintaining aspect ratio by adding padding.
 
@@ -88,17 +91,24 @@ class YOLOv8:
 
         # Compute padding
         new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-        dw, dh = (new_shape[1] - new_unpad[0]) / 2, (new_shape[0] - new_unpad[1]) / 2  # wh padding
+        dw, dh = (
+            (new_shape[1] - new_unpad[0]) / 2,
+            (new_shape[0] - new_unpad[1]) / 2,
+        )  # wh padding
 
         if shape[::-1] != new_unpad:  # resize
             img = cv2.resize(img, new_unpad, interpolation=cv2.INTER_LINEAR)
         top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
         left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
-        img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(114, 114, 114))
+        img = cv2.copyMakeBorder(
+            img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(114, 114, 114)
+        )
 
         return img, (top, left)
 
-    def draw_detections(self, img: np.ndarray, box: List[float], score: float, class_id: int) -> None:
+    def draw_detections(
+        self, img: np.ndarray, box: List[float], score: float, class_id: int
+    ) -> None:
         """Draw bounding boxes and labels on the input image based on the detected objects."""
         # Extract the coordinates of the bounding box
         x1, y1, w, h = box
@@ -113,7 +123,9 @@ class YOLOv8:
         label = f"{self.classes[class_id]}: {score:.2f}"
 
         # Calculate the dimensions of the label text
-        (label_width, label_height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        (label_width, label_height), _ = cv2.getTextSize(
+            label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1
+        )
 
         # Calculate the position of the label text
         label_x = x1
@@ -121,11 +133,24 @@ class YOLOv8:
 
         # Draw a filled rectangle as the background for the label text
         cv2.rectangle(
-            img, (label_x, label_y - label_height), (label_x + label_width, label_y + label_height), color, cv2.FILLED
+            img,
+            (label_x, label_y - label_height),
+            (label_x + label_width, label_y + label_height),
+            color,
+            cv2.FILLED,
         )
 
         # Draw the label text on the image
-        cv2.putText(img, label, (label_x, label_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+        cv2.putText(
+            img,
+            label,
+            (label_x, label_y),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
 
     def preprocess(self) -> Tuple[np.ndarray, Tuple[int, int]]:
         """
@@ -161,7 +186,9 @@ class YOLOv8:
         # Return the preprocessed image data
         return image_data, pad
 
-    def postprocess(self, input_image: np.ndarray, output: List[np.ndarray], pad: Tuple[int, int]) -> np.ndarray:
+    def postprocess(
+        self, input_image: np.ndarray, output: List[np.ndarray], pad: Tuple[int, int]
+    ) -> np.ndarray:
         """
         Perform post-processing on the model's output to extract and visualize detections.
 
@@ -188,7 +215,9 @@ class YOLOv8:
         class_ids = []
 
         # Calculate the scaling factors for the bounding box coordinates
-        gain = min(self.input_height / self.img_height, self.input_width / self.img_width)
+        gain = min(
+            self.input_height / self.img_height, self.input_width / self.img_width
+        )
         outputs[:, 0] -= pad[1]
         outputs[:, 1] -= pad[0]
 
@@ -236,8 +265,7 @@ class YOLOv8:
             classif.bottom_left_x = float(boxes[i][2])
             classif.bottom_left_y = float(boxes[i][1])
             classif.confidence = float(scores[i])
-            
-            
+
             if self.draw:
                 # Get the box, score, and class ID corresponding to the index
                 box = boxes[i]
@@ -279,10 +307,16 @@ class YOLOv8:
 if __name__ == "__main__":
     # Create an argument parser to handle command-line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="model-test-1", help="Input your ONNX model.")
+    parser.add_argument(
+        "--model", type=str, default="model-test-1", help="Input your ONNX model."
+    )
     parser.add_argument("--img", type=str, default="", help="Path to input image.")
-    parser.add_argument("--conf-thres", type=float, default=0.5, help="Confidence threshold")
-    parser.add_argument("--iou-thres", type=float, default=0.5, help="NMS IoU threshold")
+    parser.add_argument(
+        "--conf-thres", type=float, default=0.5, help="Confidence threshold"
+    )
+    parser.add_argument(
+        "--iou-thres", type=float, default=0.5, help="NMS IoU threshold"
+    )
     args = parser.parse_args()
 
     # # Check the requirements and select the appropriate backend (CPU or GPU)
@@ -292,7 +326,7 @@ if __name__ == "__main__":
     detection = YOLOv8(model, 0.4, 1)
 
     img_dir = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_nimai-all_1/test/images/"
-    img_paths = [img_dir+f for f in os.listdir(img_dir)]
+    img_paths = [img_dir + f for f in os.listdir(img_dir)]
     for img_path in img_paths:
         # Perform object detection and obtain the output image
         output_image = detection.detect(img_path)

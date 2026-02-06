@@ -1,4 +1,3 @@
-
 from os import makedirs
 from os.path import exists
 import requests
@@ -21,14 +20,15 @@ def get_dataset(dataset_name):
             print(f"Dataset '{dataset_name}' not found.")
             return None
 
+
 dataset_name = "rosobub-2025"
 client = lb.Client(api_key=credentials.API_KEY)
-            
+
 dataset = get_dataset(dataset_name)
 data_rows = dataset.data_rows()
 if not exists("./temp_update/"):
     makedirs("./temp_update")
-clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 for data_row in data_rows:
     print(f"Global key: {data_row.external_id}")
     response = requests.get(data_row.row_data)
@@ -40,6 +40,5 @@ for data_row in data_rows:
     clahe_img = cv2.cvtColor(clahe_ycrcb, cv2.COLOR_YCrCb2BGR)
     img_path = f"./temp_update/{data_row.external_id}.jpg"
     cv2.imwrite(img_path, clahe_img)
-    data_row.update(
-        row_data=img_path
-    )
+    data_row.update(row_data=img_path)
+    
