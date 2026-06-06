@@ -7,12 +7,15 @@ import config.credentials as credentials
 
 API_KEY = credentials.API_KEY
 
-DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
-                        '/camera_array/front/image_raw/compressed', 
-                        '/zed/zed_node/left/image_rect_color/compressed', 
-                        '/zed/zed_node/right/image_rect_color/compressed',
-                        '/proc_simulation/bottom/compressed',
-                        '/proc_simulation/front/compressed']
+DEFAULT_CAMERA_TOPICS = [
+    "/camera_array/bottom/image_raw/compressed",
+    "/camera_array/front/image_raw/compressed",
+    "/zed/zed_node/left/image_rect_color/compressed",
+    "/zed/zed_node/rgb/image_rect_color",
+    "/zed/zed_node/right/image_rect_color/compressed",
+    "/proc_simulation/bottom/compressed",
+    "/proc_simulation/front/compressed",
+]
 
 
 class ImageSelector():
@@ -22,7 +25,7 @@ class ImageSelector():
         :param bag_path_list: List of paths to ros2 bags.
         :param preselection_coeff: Coefficient for image preselection.
         :param topic_list: List of topic names to extract images from."""
-        
+
         self.TEMP_DIR = './temp/'
         # Ensure TEMP_DIR exists
         temp_dir_path = os.path.expanduser(self.TEMP_DIR)
@@ -35,7 +38,7 @@ class ImageSelector():
         self.clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8,8))
 
 
-    
+
     def manage_all_bags(self):
         """
         Manage all the ros2 bags.
@@ -43,11 +46,11 @@ class ImageSelector():
         """
         if not self.bag_path_list:
             raise ValueError("No bag paths provided.")
-        
+
         for bag_path in self.bag_path_list:
             self.current_bag_path = bag_path
             self._manage_bag()
-        
+
         cv2.destroyAllWindows()
 
 
@@ -57,12 +60,12 @@ class ImageSelector():
         """
         if not os.path.exists(self.current_bag_path):
             raise FileNotFoundError(f"Bag path {self.current_bag_path} does not exist.")
-        
+
         for topic in self.topic_list:
             self.current_topic = topic
             self._deserialize_ros2_bag()
-    
-    
+
+
     def _display_image(self, img, index, num_images):
         display_img = img.copy()
         scale = 2
@@ -89,6 +92,8 @@ class ImageSelector():
                 return 'front'
             case '/zed/zed_node/left/image_rect_color/compressed':
                 return 'zed_left'
+            case '/zed/zed_node/rgb/image_rect_color':
+                return 'zed_rgb'
             case '/zed/zed_node/right/image_rect_color/compressed':
                 return 'zed_right'
             case '/proc_simulation/bottom/compressed':
@@ -116,11 +121,21 @@ class ImageSelector():
                 connection, timestamp, rawdata = messages[i]
                 if connection.topic == self.current_topic:
                     msg = typestore.deserialize_cdr(rawdata, connection.msgtype)
-                    img_array = np.frombuffer(msg.data, dtype=np.uint8)
-                    img = self.preprocess_image(cv2.imdecode(img_array, cv2.IMREAD_COLOR))
+                    img = np.frombuffer(msg.data,dtype=np.uint8)
+                    if msg.encoding == "rgb8":
+                        img = img.reshape((msg.height, msg.width, 3))
+                        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    elif msg.encoding == "bgr8":
+                        img = img.reshape((msg.height, msg.width, 3))
+                    elif msg.encoding == "rgba8":
+                        img = img.reshape((msg.height, msg.width, 4))
+                        img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
+                    elif msg.encoding == "bgra8":
+                        img = img.reshape((msg.height, msg.width, 4))
+                        img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
                     self._display_image(img, int(i*self.preselection_coeff), int(len(messages)*self.preselection_coeff))
                     key = cv2.waitKey(0)
-                    filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 
+                    filename = str(timestamp) + '_' + self._simplified_topic() + '.png'
                     path = os.path.join(os.path.expanduser(self.TEMP_DIR), filename)
                     if key == ord('y'):
                         print(f"Saving image to {path}")

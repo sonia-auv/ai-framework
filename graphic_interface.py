@@ -8,12 +8,15 @@ import shutil
 
 BAG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rosbags')
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models')
-DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
-                        '/camera_array/front/image_raw/compressed', 
-                        '/zed/zed_node/left/image_rect_color/compressed', 
-                        '/zed/zed_node/right/image_rect_color/compressed',
-                        '/proc_simulation/bottom/compressed',
-                        '/proc_simulation/front/compressed']
+DEFAULT_CAMERA_TOPICS = [
+    "/camera_array/bottom/image_raw/compressed",
+    "/camera_array/front/image_raw/compressed",
+    "/zed/zed_node/left/image_rect_color/compressed",
+    "/zed/zed_node/rgb/image_rect_color",
+    "/zed/zed_node/right/image_rect_color/compressed",
+    "/proc_simulation/bottom/compressed",
+    "/proc_simulation/front/compressed",
+]
 
 
 class GraphicInterface(tk.Tk):
