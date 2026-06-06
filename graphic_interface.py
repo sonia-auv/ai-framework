@@ -10,7 +10,7 @@ BAG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rosbags')
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models')
 DEFAULT_CAMERA_TOPICS = ['/camera_array/bottom/image_raw/compressed', 
                         '/camera_array/front/image_raw/compressed', 
-                        '/zed/zed_node/left/image_rect_color/compressed', 
+                        '/zed/zed_node/left/image_rect_color', 
                         '/zed/zed_node/right/image_rect_color/compressed',
                         '/proc_simulation/bottom/compressed',
                         '/proc_simulation/front/compressed']
@@ -26,7 +26,7 @@ class GraphicInterface(tk.Tk):
         self.model_list = [os.path.join(MODEL_DIR, f) for f in os.listdir(MODEL_DIR) if f.endswith('.pt')]
         self.bag_list = [os.path.join(BAG_DIR, dir) for dir in os.listdir(BAG_DIR)]
         self.selected_bags = self.bag_list
-        self.preselection_coeff = 0.1
+        self.preselection_coeff = 1
         self.topic_list = DEFAULT_CAMERA_TOPICS
         self.selected_project = self.project_list[0][0]
         self.selected_ontology = self.ontologies_list[0][0]
@@ -253,7 +253,7 @@ class GraphicInterface(tk.Tk):
         slider = tk.Scale(
             frame7,
             from_=0.001,
-            to=0.2,
+            to=1,
             resolution=0.001,
             orient='horizontal',
             variable=self.preselection_var,

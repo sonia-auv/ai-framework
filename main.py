@@ -97,6 +97,7 @@ def main():
             val_proba=args.val_proba)
         importer.make_dataset()
         args.dataset = importer.path
+        # args.dataset = "/home/sonia/ai/ai-framework/datasets/DATASET_LITE_AQUADOME_2"
         sonia_ai = AiSonia(args)
         sonia_ai.train()
     elif args.task == 'test':

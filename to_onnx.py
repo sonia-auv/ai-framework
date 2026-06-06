@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 
-model_path = '/home/raph/Documents/ai-framework/models/robosub-2025-v0.pt'  # path to your custom trained model
+model_path = '/home/sonia/ai/ai-framework/runs/detect/aquadome_v1_2i2/model.pt'  # path to your custom trained model
 # Load a model
 model = YOLO(model_path)  # load a custom trained model
 
