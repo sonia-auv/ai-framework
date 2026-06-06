@@ -1,10 +1,13 @@
-from image_selection import ImageSelector
-from dataset_creator import DatasetCreator
-import config.credentials as credentials
-import labelbox as lb
 import os
-import tkinter as tk
 import shutil
+import tkinter as tk
+
+import labelbox as lb
+from labelbox import Client
+
+import config.credentials as credentials
+from dataset_creator import DatasetCreator
+from image_selection import ImageSelector
 
 BAG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rosbags")
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
@@ -12,6 +15,7 @@ DEFAULT_CAMERA_TOPICS = [
     "/camera_array/bottom/image_raw/compressed",
     "/camera_array/front/image_raw/compressed",
     "/zed/zed_node/left/image_rect_color/compressed",
+    "/zed/zed_node/rgb/image_rect_color/compressed",
     "/zed/zed_node/right/image_rect_color/compressed",
     "/proc_simulation/bottom/compressed",
     "/proc_simulation/front/compressed",
@@ -21,23 +25,28 @@ DEFAULT_CAMERA_TOPICS = [
 class GraphicInterface(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.client = lb.Client(api_key=credentials.API_KEY)
+
+        self.label_box_api: Client = lb.Client(api_key=credentials.API_KEY)
+
         self.project_list = [
-            (project.name, project.uid) for project in self.client.get_projects()
+            (project.name, project.uid) for project in self.label_box_api.get_projects()
         ]
+
         self.ontologies_list = [
             (ontology.name, ontology.uid)
-            for ontology in self.client.get_ontologies(name_contains="")
+            for ontology in self.label_box_api.get_ontologies(name_contains="")
         ]
         self.datasets_list = [
-            (dataset.name, dataset.uid) for dataset in self.client.get_datasets()
+            (dataset.name, dataset.uid) for dataset in self.label_box_api.get_datasets()
         ]
         self.model_list = [
             os.path.join(MODEL_DIR, f)
             for f in os.listdir(MODEL_DIR)
             if f.endswith(".pt")
         ]
-        self.bag_list = [os.path.join(BAG_DIR, dir) for dir in os.listdir(BAG_DIR)]
+        self.bag_list = [
+            os.path.join(BAG_DIR, directory) for directory in os.listdir(BAG_DIR)
+        ]
         self.selected_bags = self.bag_list
         self.preselection_coeff = 0.1
         self.topic_list = DEFAULT_CAMERA_TOPICS
@@ -379,7 +388,7 @@ class GraphicInterface(tk.Tk):
 
         print("Image selection completed. Proceeding to dataset creation...")
         dataset_creator = DatasetCreator(
-            self.client,
+            self.label_box_api,
             self.selected_project,
             self.selected_ontology,
             self.selected_dataset,
@@ -389,5 +398,3 @@ class GraphicInterface(tk.Tk):
         dataset_creator.create_dataset()
 
         shutil.rmtree(selector.TEMP_DIR)
-
-    
