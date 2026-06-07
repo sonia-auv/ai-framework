@@ -22,7 +22,7 @@ batch: 0.99 # (int) number of images per batch (-1 for AutoBatch).
 rect: True
 
 # [368, 672] is good, 320 is faster but induces a loss of precision.
-imgsz: [720, 1280] # (int | list) input images size as int for train and val modes, or list[h,w] for predict and export modes.
+imgsz: 1280 # (int | list) input images size as int for train and val modes, or list[h,w] for predict and export modes.
 
 # If you want to train a model, don't set it as False.
 save: True # (bool) save train checkpoints and predict results.
