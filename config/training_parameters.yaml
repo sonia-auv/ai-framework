@@ -17,7 +17,7 @@ time: # (float, optional) number of hours to train for, overrides epochs if supp
 patience: 20 # (int) epochs to wait for no observable improvement for early stopping of training.
 
 # Take care not to overload the RAM memory of your computer.
-batch: 0.99 # (int) number of images per batch (-1 for AutoBatch).
+batch: 0.90 # (int) number of images per batch (-1 for AutoBatch).
 
 rect: True
 
