@@ -115,7 +115,7 @@ class ImageSelector():
         with Reader(self.current_bag_path) as reader:
             print(reader.message_count)
             for j in range((reader.message_count//10)+1):
-                messages = list(reader.messages(start=1762643767876457898+333000000*j,stop=1762643767876457898+333000000*(j+1)))
+                messages = list(reader.messages())
                 i = 0
                 while i < len(messages):
                     connection, timestamp, rawdata = messages[i]

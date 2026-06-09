@@ -338,7 +338,6 @@ class GraphicInterface(tk.Tk):
 
         selector = ImageSelector(self.selected_bags, self.preselection_coeff, self.topic_list)
         selector.manage_all_bags()
-
         print("Image selection completed. Proceeding to dataset creation...")
         dataset_creator = DatasetCreator(self.client, 
                                          self.selected_project, 
