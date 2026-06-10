@@ -26,7 +26,7 @@ class GraphicInterface(tk.Tk):
         self.model_list = [os.path.join(MODEL_DIR, f) for f in os.listdir(MODEL_DIR) if f.endswith('.pt')]
         self.bag_list = [os.path.join(BAG_DIR, dir) for dir in os.listdir(BAG_DIR)]
         self.selected_bags = self.bag_list
-        self.preselection_coeff = 1
+        self.preselection_coeff = 0.1
         self.topic_list = DEFAULT_CAMERA_TOPICS
         self.selected_project = self.project_list[0][0]
         self.selected_ontology = self.ontologies_list[0][0]
@@ -335,6 +335,7 @@ class GraphicInterface(tk.Tk):
         print(self.selected_dataset)
         print(self.model_path)
         print(self.selected_bags)
+        print(self.topic_list)
 
         selector = ImageSelector(self.selected_bags, self.preselection_coeff, self.topic_list)
         selector.manage_all_bags()

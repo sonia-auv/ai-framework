@@ -114,41 +114,41 @@ class ImageSelector():
         # Create reader instance and open for reading.
         with Reader(self.current_bag_path) as reader:
             print(reader.message_count)
-            for j in range((reader.message_count//10)+1):
-                messages = list(reader.messages())
-                i = 0
-                while i < len(messages):
-                    connection, timestamp, rawdata = messages[i]
-                    if connection.topic == self.current_topic:
-                        msg = typestore.deserialize_cdr(rawdata, connection.msgtype)
-                        img = br.imgmsg_to_cv2(msg)
-                        self._display_image(img, int(i*self.preselection_coeff), int(len(messages)*self.preselection_coeff))
-                        key = cv2.waitKey(0)
-                        filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 
-                        path = os.path.join(os.path.expanduser(self.TEMP_DIR), filename)
-                        if key == ord('y'):
-                            print(f"Saving image to {path}")
-                            cv2.imwrite(path, img)
-                            i += round(1/self.preselection_coeff)
-                        elif key == ord('q'):
-                            print("Exiting image selection.")
-                            i = len(messages)
-                        elif key == ord('p'):
-                            print("Going to previous image.")
-                            i -= round(1/self.preselection_coeff)
-                            if i < 0:
-                                i = 0
-                        elif key == ord('n'):
-                            if os.path.exists(path):
-                                print(f"Removing image {path}")
-                                os.remove(path)
-                            i += round(1/self.preselection_coeff)
-                        elif key == 27:  # ESC key
-                            exit()
-                        else:
-                            self._print_help()
-                    else:
+            # for j in range((reader.message_count//10)+1):
+            messages = list(reader.messages())
+            i = 0
+            while i < len(messages):
+                connection, timestamp, rawdata = messages[i]
+                if connection.topic == self.current_topic:
+                    msg = typestore.deserialize_cdr(rawdata, connection.msgtype)
+                    img = br.imgmsg_to_cv2(msg)
+                    self._display_image(img, int(i*self.preselection_coeff), int(len(messages)*self.preselection_coeff))
+                    key = cv2.waitKey(0)
+                    filename = str(timestamp) + '_' + self._simplified_topic() + '.png' 
+                    path = os.path.join(os.path.expanduser(self.TEMP_DIR), filename)
+                    if key == ord('y'):
+                        print(f"Saving image to {path}")
+                        cv2.imwrite(path, img)
+                        i += round(1/self.preselection_coeff)
+                    elif key == ord('q'):
+                        print("Exiting image selection.")
                         i = len(messages)
+                    elif key == ord('p'):
+                        print("Going to previous image.")
+                        i -= round(1/self.preselection_coeff)
+                        if i < 0:
+                            i = 0
+                    elif key == ord('n'):
+                        if os.path.exists(path):
+                            print(f"Removing image {path}")
+                            os.remove(path)
+                        i += round(1/self.preselection_coeff)
+                    elif key == 27:  # ESC key
+                        exit()
+                    else:
+                        self._print_help()
+                else:
+                    i = len(messages)
 
 
     def _print_help(self):
