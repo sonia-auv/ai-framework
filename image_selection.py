@@ -8,13 +8,13 @@ import config.credentials as credentials
 API_KEY = credentials.API_KEY
 
 DEFAULT_CAMERA_TOPICS = [
-    "/camera_array/bottom/image_raw/compressed",
-    "/camera_array/front/image_raw/compressed",
-    "/zed/zed_node/left/image_rect_color/compressed",
+    "/camera_array/bottom/image_raw",
+    "/camera_array/front/image_raw",
+    "/zed/zed_node/left/image_rect_color",
     "/zed/zed_node/rgb/image_rect_color",
-    "/zed/zed_node/right/image_rect_color/compressed",
-    "/proc_simulation/bottom/compressed",
-    "/proc_simulation/front/compressed",
+    "/zed/zed_node/right/image_rect_color",
+    "/proc_simulation/bottom",
+    "/proc_simulation/front",
 ]
 
 
@@ -86,19 +86,19 @@ class ImageSelector():
 
     def _simplified_topic(self):
         match self.current_topic:
-            case '/camera_array/bottom/image_raw/compressed':
+            case '/camera_array/bottom/image_raw':
                 return 'bottom'
-            case '/camera_array/front/image_raw/compressed':
+            case '/camera_array/front/image_raw':
                 return 'front'
-            case '/zed/zed_node/left/image_rect_color/compressed':
+            case '/zed/zed_node/left/image_rect_color':
                 return 'zed_left'
             case '/zed/zed_node/rgb/image_rect_color':
                 return 'zed_rgb'
-            case '/zed/zed_node/right/image_rect_color/compressed':
+            case '/zed/zed_node/right/image_rect_color':
                 return 'zed_right'
-            case '/proc_simulation/bottom/compressed':
+            case '/proc_simulation/bottom':
                 return 'sim_bottom'
-            case '/proc_simulation/front/compressed':
+            case '/proc_simulation/front':
                 return 'sim_front'
 
 
