@@ -88,6 +88,7 @@ def main():
     assert not args.dataset is None or not args.labelbox_projects is None
     assert not args.model is None
     if args.task == 'train':
+        print(args.labelbox_projects)
         importer = Dataset_importer(
             client=lb.Client(api_key=credentials.API_KEY),
             project_names=args.labelbox_projects,
@@ -97,6 +98,7 @@ def main():
             val_proba=args.val_proba)
         importer.make_dataset()
         args.dataset = importer.path
+        # args.dataset = "/home/sonia/ai/ai-framework/datasets/DATASET_LITE_AQUADOME_2"
         sonia_ai = AiSonia(args)
         sonia_ai.train()
     elif args.task == 'test':

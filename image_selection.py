@@ -3,6 +3,7 @@ from rosbags.rosbag2 import Reader
 from rosbags.typesys import Stores, get_typestore
 import numpy as np
 import cv2
+from cv_bridge import CvBridge
 import config.credentials as credentials
 
 API_KEY = credentials.API_KEY
@@ -115,6 +116,8 @@ class ImageSelector():
 
         # Create reader instance and open for reading.
         with Reader(self.current_bag_path) as reader:
+            print(reader.message_count)
+            # for j in range((reader.message_count//10)+1):
             messages = list(reader.messages())
             i = 0
             while i < len(messages):

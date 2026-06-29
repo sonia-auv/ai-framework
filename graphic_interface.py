@@ -109,7 +109,7 @@ class GraphicInterface(tk.Tk):
             anchor='w'
             )
             rb.grid(row=idx+2, column=0, sticky='w', padx=10)
-        
+
         self.model_var.trace_add('write', self.update_model_var)
         # Set initial model_path
         self.model_path = None
@@ -240,7 +240,7 @@ class GraphicInterface(tk.Tk):
             chk = tk.Checkbutton(frame6, text=topic, variable=var)
             chk.grid(row=idx+1, column=0, sticky='w')
             self.topic_vars.append(var)
-        
+
         for var in self.topic_vars:
             var.trace_add('write', lambda *args: self.update_selected_topics())
 
@@ -256,7 +256,7 @@ class GraphicInterface(tk.Tk):
         slider = tk.Scale(
             frame7,
             from_=0.001,
-            to=0.2,
+            to=1,
             resolution=0.001,
             orient='horizontal',
             variable=self.preselection_var,
@@ -281,7 +281,7 @@ class GraphicInterface(tk.Tk):
 
     def update_ontology_var(self, *args):
         val = self.ontology_var.get()
-        self.selected_ontology = self.ontologies_list[0][0] if val == "__none__" else val 
+        self.selected_ontology = self.ontologies_list[0][0] if val == "__none__" else val
 
 
     def update_project_var(self, *args):
@@ -291,13 +291,13 @@ class GraphicInterface(tk.Tk):
         elif val == "__new__":
             self.selected_project = self.new_project_var.get()
         else :
-            self.selected_project = val 
+            self.selected_project = val
 
 
     def update_dataset_var(self, *args):
         val = self.dataset_var.get()
         if val == "__none__":
-            self.selected_dataset = self.datasets_list[0][0] 
+            self.selected_dataset = self.datasets_list[0][0]
         elif val == "__new__":
             self.selected_dataset = self.new_dataset_var.get()
         else:
@@ -309,7 +309,7 @@ class GraphicInterface(tk.Tk):
         if not self.topic_list:
             self.topic_list = DEFAULT_CAMERA_TOPICS
 
-    
+
     def update_preselection_coeff(self, *args):
         self.preselection_coeff = self.preselection_var.get()
 
@@ -338,19 +338,18 @@ class GraphicInterface(tk.Tk):
         print(self.selected_dataset)
         print(self.model_path)
         print(self.selected_bags)
+        print(self.topic_list)
 
         selector = ImageSelector(self.selected_bags, self.preselection_coeff, self.topic_list)
         selector.manage_all_bags()
-
         print("Image selection completed. Proceeding to dataset creation...")
-        dataset_creator = DatasetCreator(self.client, 
-                                         self.selected_project, 
-                                         self.selected_ontology, 
-                                         self.selected_dataset, 
-                                         selector.TEMP_DIR, 
+        dataset_creator = DatasetCreator(self.client,
+                                         self.selected_project,
+                                         self.selected_ontology,
+                                         self.selected_dataset,
+                                         selector.TEMP_DIR,
                                          self.model_path)
         dataset_creator.create_dataset()
 
         shutil.rmtree(selector.TEMP_DIR)
 
-    

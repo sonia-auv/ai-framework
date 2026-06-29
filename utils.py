@@ -141,9 +141,8 @@ def save_img_with_boxes(img, boxes, names, image_with_labels_path):
         font_size = 16
         text_y = top - font_size if top - font_size > 0 else top + 2
         draw.text((left, text_y), names[i], fill="red", font=ImageFont.load_default())
-        
-    with open(image_with_labels_path, 'w', encoding='utf-8') as f:
-        Image.Image.save(img, f, format='JPEG')
+    
+    img.save(image_with_labels_path)
 
 
 def save_boxes(img, boxes, names, labels_path, available_classes):

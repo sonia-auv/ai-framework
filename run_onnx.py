@@ -54,14 +54,14 @@ class YOLOv8:
             confidence_thres (float): Confidence threshold for filtering detections.
             iou_thres (float): IoU threshold for non-maximum suppression.
         """
-        self.onnx_model = "models/"+onnx_model+"/"+onnx_model+".onnx"
+        self.onnx_model = "/home/sonia/ai/ai-framework/runs/detect/"+onnx_model+"/model.onnx"
         self.input_image = None
-        self.draw = False
+        self.draw = True
         self.confidence_thres = confidence_thres
         self.iou_thres = iou_thres
 
         # Load the class names from the COCO dataset
-        with open("models/"+onnx_model+"/data.yaml", 'r') as stream:
+        with open("/home/sonia/ai/ai-framework/runs/detect/"+onnx_model+"/data.yaml", 'r') as stream:
             self.classes = yaml.safe_load(stream)["names"]
         # Generate a color palette for the classes
         self.color_palette = np.random.uniform(0, 255, size=(len(self.classes), 3))
@@ -147,7 +147,7 @@ class YOLOv8:
         # Convert the image color space from BGR to RGB
         img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
 
-        img, pad = self.letterbox(img, (self.input_width, self.input_height))
+        img, pad = self.letterbox(img, (1280, 1280))
 
         # Normalize the image data by dividing it by 255.0
         image_data = np.array(img) / 255.0
@@ -222,20 +222,22 @@ class YOLOv8:
         # Apply non-maximum suppression to filter out overlapping bounding boxes
         indices = cv2.dnn.NMSBoxes(boxes, scores, self.confidence_thres, self.iou_thres)
 
-        detections = DetectionArray()
-        detections.detected_object = []
+        detections = []
         # Iterate over the selected indices after non-maximum suppression
         for i in indices:
-            classif = Detection()
-            classif.top_left_x = float(boxes[i][0])
-            classif.top_left_y = float(boxes[i][1])
-            classif.top_right_x = float(boxes[i][0])
-            classif.top_right_y = float(boxes[i][3])
-            classif.bottom_right_x = float(boxes[i][2])
-            classif.bottom_right_y = float(boxes[i][3])
-            classif.bottom_left_x = float(boxes[i][2])
-            classif.bottom_left_y = float(boxes[i][1])
-            classif.confidence = float(scores[i])
+            classif = []
+            classif.append(self.classes[class_id])
+            classif.append(float(boxes[i][0]))
+            classif.append(float(boxes[i][1]))
+            classif.append(float(boxes[i][0]))
+            classif.append(float(boxes[i][3]))
+            classif.append(float(boxes[i][2]))
+            classif.append(float(boxes[i][3]))
+            classif.append(float(boxes[i][2]))
+            classif.append(float(boxes[i][1]))
+            classif.append(float(scores[i]))
+            
+            detections.append(classif)
             
             
             if self.draw:
@@ -279,27 +281,30 @@ class YOLOv8:
 if __name__ == "__main__":
     # Create an argument parser to handle command-line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="model-test-1", help="Input your ONNX model.")
+    parser.add_argument("--model", type=str, default="aquadome_v1_2i_Torpedo", help="Input your ONNX model.")
     parser.add_argument("--img", type=str, default="", help="Path to input image.")
-    parser.add_argument("--conf-thres", type=float, default=0.5, help="Confidence threshold")
-    parser.add_argument("--iou-thres", type=float, default=0.5, help="NMS IoU threshold")
+    parser.add_argument("--conf-thres", type=float, default=0.1, help="Confidence threshold")
+    parser.add_argument("--iou-thres", type=float, default=0.1, help="NMS IoU threshold")
     args = parser.parse_args()
 
     # # Check the requirements and select the appropriate backend (CPU or GPU)
     # check_requirements("onnxruntime-gpu" if torch.cuda.is_available() else "onnxruntime")
 
     # Create an instance of the YOLOv8 class with the specified arguments
-    detection = YOLOv8(model, 0.4, 1)
+    detection = YOLOv8(args.model, 0.4, 0.05)
 
-    img_dir = "/home/raph/Documents/ai-framework/datasets/bottom-maude-et-nimai-lite_nimai-zed_nimai-all_1/test/images/"
+    img_dir = "/home/sonia/Downloads/image/"
+    # img_dir = "/home/sonia/ai/ai-framework/datasets/DATASET_LITE_AQUADOME_2/test/images/"
     img_paths = [img_dir+f for f in os.listdir(img_dir)]
+    print(img_paths)
     for img_path in img_paths:
         # Perform object detection and obtain the output image
         output_image = detection.detect(img_path)
+        print(output_image)
 
         # Display the output image in a window
         cv2.namedWindow("Output", cv2.WINDOW_NORMAL)
-        cv2.imshow("Output", output_image)
+        cv2.imshow("Output", detection.img)
 
         # Wait for a key press to exit
         cv2.waitKey(0)

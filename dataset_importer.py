@@ -191,13 +191,12 @@ class Dataset_importer:
             img_name = item[0]
             img_url = item[1]
             labels = item[2]
-            img_path = os.path.join(self.path, set_type, 'images', img_name + '.jpg')
-            image_with_labels_path = os.path.join(self.path, set_type, 'image_with_labels', img_name + '.jpg')
+            img_path = os.path.join(self.path, set_type, 'images', img_name + '.png')
+            image_with_labels_path = os.path.join(self.path, set_type, 'image_with_labels', img_name + '.png')
             response = requests.get(img_url)
             img = Image.open(BytesIO(response.content))
 
-            with open(img_path, 'w', encoding='utf-8') as f:
-                Image.Image.save(img, f, format='JPEG')
+            img.save(img_path)
 
             if labels["detection"] is not None:
                 labels_path = os.path.join(self.path, set_type, 'labels', img_name + '.txt')
