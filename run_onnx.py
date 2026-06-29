@@ -281,7 +281,7 @@ class YOLOv8:
 if __name__ == "__main__":
     # Create an argument parser to handle command-line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="aquadome_v1_2i_11m2", help="Input your ONNX model.")
+    parser.add_argument("--model", type=str, default="aquadome_v1_2i_Torpedo", help="Input your ONNX model.")
     parser.add_argument("--img", type=str, default="", help="Path to input image.")
     parser.add_argument("--conf-thres", type=float, default=0.1, help="Confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.1, help="NMS IoU threshold")
@@ -293,7 +293,7 @@ if __name__ == "__main__":
     # Create an instance of the YOLOv8 class with the specified arguments
     detection = YOLOv8(args.model, 0.4, 0.05)
 
-    img_dir = "/home/sonia/ai/ai-framework/temp/"
+    img_dir = "/home/sonia/Downloads/image/"
     # img_dir = "/home/sonia/ai/ai-framework/datasets/DATASET_LITE_AQUADOME_2/test/images/"
     img_paths = [img_dir+f for f in os.listdir(img_dir)]
     print(img_paths)
