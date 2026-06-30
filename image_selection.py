@@ -3,7 +3,7 @@ from rosbags.rosbag2 import Reader
 from rosbags.typesys import Stores, get_typestore
 import numpy as np
 import cv2
-from cv_bridge import CvBridge
+# from cv_bridge import CvBridge
 import config.credentials as credentials
 
 API_KEY = credentials.API_KEY
